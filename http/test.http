@@ -1,0 +1,56 @@
+GET http://localhost:3000/products
+
+###
+
+GET http://localhost:3000/products/?offset=2&limit=3
+
+###
+
+GET http://localhost:3000/products/?keyword=커피
+
+###
+
+GET http://localhost:3000/articles
+
+###
+
+GET http://localhost:3000/products/1e112c02-7c92-4d52-b76e-485e41e3f64d
+
+###
+
+GET http://localhost:3000/articles/c8011d2a-b91a-40ca-811e-f1e0117c0ce4
+
+###
+
+POST http://localhost:3000/products
+Content-Type: application/json
+
+{
+  "name": "test product2",
+  "description": "test description",
+  "price": 10000
+}
+
+###
+
+PATCH http://localhost:3000/products/babc30af-c114-4d61-a60c-4bd8a46835aa
+Content-Type: application/json
+
+{
+  "name": "patch test",
+  "description": "patch description"
+}
+
+###
+
+DELETE http://localhost:3000/products/babc30af-c114-4d61-a60c-4bd8a46835aa
+
+###
+
+POST http://localhost:3000/articles
+Content-Type: application/json
+
+{
+  "title": "test name",
+  "content": "test description",
+}
