@@ -16,6 +16,7 @@
     "is-email": "^1.0.2",
     "is-uuid": "^1.0.2",
     "multer": "^2.0.1",
+    "path": "^0.12.7",
     "prisma": "^5.4.2",
     "substruct": "^2.0.1",
     "superstruct": "^1.0.3"

@@ -54,3 +54,31 @@ Content-Type: application/json
   "title": "test name",
   "content": "test description",
 }
+
+###
+
+POST http://localhost:3000/files
+Content-Type: multipart/form-data; boundary=Boundary01234567890123456789
+
+--Boundary01234567890123456789
+Content-Disposition: form-data; name="attachment"; filename="hello.txt"
+Content-Type: text/plain
+
+Hello!
+--Boundary01234567890123456789--
+
+###
+
+POST http://localhost:3000/files/single-image
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+----WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="image"; filename="image.png"
+Content-Type: image/png
+
+< C:\nodejs\images\image.png
+----WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+###
+
+GET http://localhost:3000/8b4b026ea3119bc8da10335c61e976fd
