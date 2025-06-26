@@ -624,3 +624,49 @@ export const ARTICLES = [
     content: "테스트 내용 5"
   }
 ]
+
+export const PRODUCTCOMENTS = [
+  { 
+    content: "테스트 상품1 댓글 1",
+    productId: "1e112c02-7c92-4d52-b76e-485e41e3f64d"
+  },
+  { 
+    content: "테스트 상품1 댓글 2",
+    productId: "1e112c02-7c92-4d52-b76e-485e41e3f64d"
+  },
+  { 
+    content: "테스트 상품2 댓글 1",
+    productId: "f751e63f-686d-42d4-898e-3ef6d4137908"
+  },
+  { 
+    content: "테스트 상품2 댓글 2",
+    productId: "f751e63f-686d-42d4-898e-3ef6d4137908"
+  },
+  { 
+    content: "테스트 상품2 댓글 3",
+    productId: "f751e63f-686d-42d4-898e-3ef6d4137908"
+  },
+]
+
+export const ARTICLECOMENTS = [
+  { 
+    content: "테스트 게시물1 댓글 1",
+    articleId: "0a1d21e1-fff0-40f7-9a06-e999390dd3b2"
+  },
+  { 
+    content: "테스트 게시물2 댓글 1",
+    articleId: "ec212d0e-a58a-4087-a5a8-8c3f9b5a1e1a"
+  },
+  { 
+    content: "테스트 게시물2 댓글 2",
+    articleId: "ec212d0e-a58a-4087-a5a8-8c3f9b5a1e1a"
+  },
+  { 
+    content: "테스트 게시물3 댓글 1",
+    articleId: "b2baa47e-5981-4f98-ad61-952aab1fefc3"
+  },
+  { 
+    content: "테스트 게시물4 댓글 1",
+    articleId: "29dd9e32-df83-473c-ac2b-f4b2bbcc27d9"
+  }
+]
