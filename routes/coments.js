@@ -1,8 +1,7 @@
 import express from 'express';
-import { PrismaClient, Prisma } from '@prisma/client';
 import { asyncHandler } from '../middlewares/asyncHandler.js';
 import { getProductComments, createProductComment, patchProductComment, deleteProductComment, getArticleComments, createArticleComment, patchArticleComment, deleteArticleComment } from '../controllers/commentController.js';
-const prisma = new PrismaClient();
+
 
 const commentRouter = express.Router();
 

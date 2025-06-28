@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { assert } from "superstruct";
 
-const prisma = PrismaClient();
+const prisma = new PrismaClient();
 
 export const getProductComments = async (req, res) => {
     const { cursor, limit = 5, order = 'recent' } = req.query;

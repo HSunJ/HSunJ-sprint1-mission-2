@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import { PatchProduct } from '../structs.js';
 import { assert } from "superstruct";
 
-const prisma = PrismaClient();
+const prisma = new PrismaClient();
 
 export const getProducts = async (req, res) => {
     const { offset = 0, limit = 10, order = "recent", keyword = "" } = req.query;
