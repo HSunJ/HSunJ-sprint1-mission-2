@@ -80,6 +80,11 @@ Content-Type: application/json
 
 ###
 
+DELETE  http://localhost:3000/comments/products/c3891359-4cf8-4a17-bf5d-0dc500773892
+
+
+###
+
 POST http://localhost:3000/files
 Content-Type: multipart/form-data; boundary=Boundary01234567890123456789
 
