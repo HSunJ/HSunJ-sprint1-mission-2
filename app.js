@@ -6,6 +6,7 @@ import { PrismaClient, Prisma } from '@prisma/client';
 import productRouter from './routes/product.js';
 import articleRouter from './routes/article.js';
 import uploadRouter from './routes/upload.js';
+import commentRouter from './routes/coments.js';
 import { asyncHandler } from './middlewares/asyncHandler.js';
 import { fileURLToPath } from 'url';
 
@@ -22,6 +23,7 @@ app.use(express.static(path.join(dir, 'uploads')));
 app.use('/products', productRouter);
 app.use('/articles', articleRouter);
 app.use('/files', uploadRouter);
+app.use('/comments', commentRouter )
 
 /*********** coments ***********/
 

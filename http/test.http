@@ -14,6 +14,10 @@ GET http://localhost:3000/articles
 
 ###
 
+GET http://localhost:3000/comments/products
+
+###
+
 GET http://localhost:3000/products/1e112c02-7c92-4d52-b76e-485e41e3f64d
 
 ###
@@ -53,6 +57,25 @@ Content-Type: application/json
 {
   "title": "test name",
   "content": "test description",
+}
+
+###
+
+POST http://localhost:3000/comments/products
+Content-Type: application/json
+
+{
+  "content": "test description",
+  "productId": "e5d7a4f3-9e21-4125-9e1c-216d5a226b74"
+}
+
+###
+
+PATCH http://localhost:3000/comments/products/4d28aa90-ad6a-4afa-b16e-95b88021ef4d
+Content-Type: application/json
+
+{
+  "content": "댓글 수정 테스트"
 }
 
 ###

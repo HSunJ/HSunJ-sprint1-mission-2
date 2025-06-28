@@ -1,3 +1,5 @@
+import { Prisma } from "@prisma/client";
+
 export function asyncHandler(handler) {
   return async function (req, res) {
     try {
@@ -10,7 +12,7 @@ export function asyncHandler(handler) {
         res.sendStatus(404);
       } else {
         res.status(500).send({ message: e.message });
-        console.log(err.message);
+        console.log(e.message);
       }
     }
   };
