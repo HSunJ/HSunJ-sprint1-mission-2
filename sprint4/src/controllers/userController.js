@@ -22,7 +22,15 @@ export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
     const user = await userService.getUser(email, password);
-    return res.status(201).json(user);
+    const accessToken = await userService.createToken(user);
+    const response = {
+      ...user,
+      accessToken,
+      message : "로그인에 성공했습니다"
+    }
+    return res.status(201).json(response);
+    // return res.json({ accessToken });
+    // return res.status(201).json(user);
   } catch (error) {
     next(error);
   }

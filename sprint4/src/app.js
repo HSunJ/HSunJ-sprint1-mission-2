@@ -39,7 +39,7 @@ app.use('/', (err, req, res, next) => {
     console.error('유효성 검사 에러:', err.failures());
     return res.status(400).json({ message: '입력 형식이 올바르지 않습니다.' });
   }
-  res.status(err.code).json({ message: err.message });
+  res.status(err.code ? err.code : 500).json({ message: err.message });
   console.log(err.message);
 })
 

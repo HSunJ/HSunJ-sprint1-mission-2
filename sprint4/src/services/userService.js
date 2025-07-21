@@ -1,8 +1,14 @@
 import bcrypt from "bcrypt";
+import jwt from 'jsonwebtoken';
 
-import userRepository from "../repositories/userRepository.js"
+import userRepository from "../repositories/userRepository.js";
 import { checkPassword } from "../utils/hash.js";
 
+const createToken = async (user) => {
+  const payload = { userId: user.id }
+  const options = { expiresIn: '1h' }
+  return jwt.sign(payload, process.env.JWT_SECRET, options);
+};
 
 const createUser = async (user) => {
   const isExistUser = await userRepository.findByEmail(user.email);
@@ -12,11 +18,11 @@ const createUser = async (user) => {
     error.code = 422;
     error.data = { email: user.email };
     throw error;
-  }
+  };
 
   const newUser = await userRepository.save(user);
   return filterSensitiveUserDate(newUser);
-}
+};
 
 const getUser = async (email, password) => {
   const user = await userRepository.findByEmail(email);
@@ -24,23 +30,24 @@ const getUser = async (email, password) => {
     const error = new Error('존재하지 않는 유저입니다');
     error.code = 401;
     throw error;
-  }
+  };
 
   if (!checkPassword(password, user.password)) {
     const error = new Error('비밀번호가 틀렸습니다');
     error.code = 401;
     throw error;
-  }
+  };
 
   return filterSensitiveUserDate(user);
-}
+};
 
 const filterSensitiveUserDate = (userData) => {
   const { password, salt, ...unsensitiveData } = userData;
   return unsensitiveData;
-}
+};
 
 export default {
+  createToken,
   createUser,
   getUser,
-}
+};
