@@ -24,6 +24,7 @@ app.use('/products', productRouter);
 app.use('/articles', articleRouter);
 app.use('/comments', commentRouter )
 app.use('/files', uploadRouter);
+app.use('/users',)
 
 
 app.use('/', (err, req, res, next) => {
