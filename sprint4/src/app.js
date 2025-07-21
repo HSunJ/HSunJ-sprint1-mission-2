@@ -2,12 +2,15 @@ import * as dotenv from 'dotenv';
 import express from 'express';
 import path from 'path';
 import cors from 'cors';
-import { PrismaClient, Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/client';
+
 import productRouter from './routes/product.js';
 import articleRouter from './routes/article.js';
 import uploadRouter from './routes/upload.js';
 import commentRouter from './routes/coments.js';
+import userRouter from './routes/users.js';
 import { fileURLToPath } from 'url';
+
 
 dotenv.config();
 
@@ -24,7 +27,7 @@ app.use('/products', productRouter);
 app.use('/articles', articleRouter);
 app.use('/comments', commentRouter )
 app.use('/files', uploadRouter);
-app.use('/users',)
+app.use('/users', userRouter);
 
 
 app.use('/', (err, req, res, next) => {
@@ -36,7 +39,7 @@ app.use('/', (err, req, res, next) => {
     console.error('유효성 검사 에러:', err.failures());
     return res.status(400).json({ message: '입력 형식이 올바르지 않습니다.' });
   }
-  res.status(500).json({ message: '서버 오류가 발생했습니다.' });
+  res.status(err.code).json({ message: err.message });
   console.log(err.message);
 })
 
