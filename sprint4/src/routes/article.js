@@ -3,16 +3,21 @@ import express from 'express';
 import { validateArticle } from '../middlewares/validateArticle.js';
 import { asyncHandler } from '../middlewares/asyncHandler.js';
 import { getArticles, getArticle, createArticle, patchArticle, deleteArticle } from '../controllers/articleController.js';
+import auth from '../middlewares/auth.js';
 
 const articleRouter = express.Router();
 
 articleRouter.route('/')
     .get(asyncHandler(getArticles))
-    .post(validateArticle, asyncHandler(createArticle));
+    .post(validateArticle, 
+        auth.verifyAccessToken, 
+        asyncHandler(createArticle));
 
 articleRouter.route('/:id')
     .get(asyncHandler(getArticle))
-    .patch(asyncHandler(patchArticle))
-    .delete(asyncHandler(deleteArticle));
+    .patch(auth.verifyAccessToken,
+        asyncHandler(patchArticle))
+    .delete(auth.verifyAccessToken,
+        asyncHandler(deleteArticle));
 
 export default articleRouter;
