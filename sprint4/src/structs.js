@@ -12,7 +12,7 @@ const Tags = [
 ]
 export const CreateProduct = s.object({
   name: s.size(s.string(), 1, 60),
-  description: s.string(),
+  description: s.optional(s.string()),
   price: s.min(s.number(), 0),
   tags: s.optional(s.enums(Tags))
 });

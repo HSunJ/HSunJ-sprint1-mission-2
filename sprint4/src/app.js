@@ -25,7 +25,7 @@ app.use(express.static(path.join(dir, 'uploads')));
 
 app.use('/products', productRouter);
 app.use('/articles', articleRouter);
-app.use('/comments', commentRouter )
+app.use('/comments', commentRouter)
 app.use('/files', uploadRouter);
 app.use('/users', userRouter);
 
@@ -38,6 +38,11 @@ app.use('/', (err, req, res, next) => {
   if (err.name === 'StructError' && err.failures) {
     console.error('유효성 검사 에러:', err.failures());
     return res.status(400).json({ message: '입력 형식이 올바르지 않습니다.' });
+  }
+
+  if (err.code === 'credentials_required') {
+    err.code = 401
+    err.message = "권한이 없습니다"
   }
   res.status(err.code ? err.code : 500).json({ message: err.message });
   console.log(err.message);
