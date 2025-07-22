@@ -33,31 +33,60 @@ async function main() {
   };
 
   // 상품 데이터 삽입
-  const createdProduct = [];
+  const createdProductId = [];
   for(const productData of PRODUCTS){
     const userId = getRandomUserId(createdUser, userEmails); // 유저 아이디 하나를 가져옴
 
-    createdProduct.push(await prisma.product.create({
+    const product = await prisma.product.create({
       data:{
         ...productData,
         userId,
       }
-    }));
+    });
+    createdProductId.push(product.id);
   };
 
   // 게시물 데이터 삽입
-  const createdArticle = [];
+  const createdArticleId = [];
   for(const articleData of ARTICLES){
     const userId = getRandomUserId(createdUser, userEmails); // 유저 아이디 하나를 가져옴
 
-    createdArticle.push(await prisma.article.create({
+    const article = await prisma.article.create({
       data:{
         ...articleData,
         userId,
       }
-    }));
+    });
+    createdArticleId.push(article.id);
   };
 
+  // 상품 댓글 데이터 삽입
+  for(const commentData of PRODUCTCOMENTS){
+    const userId = getRandomUserId(createdUser, userEmails);
+    const productId = createdProductId[0];
+
+    await prisma.productComment.create({
+      data:{
+        ...commentData,
+        productId,
+        userId,
+      }
+    });
+  };
+
+  // 게시물 댓글 데이터 삽입
+  for(const commentData of ARTICLECOMENTS){
+    const userId = getRandomUserId(createdUser, userEmails);
+    const articleId = createdArticleId[0];
+
+    await prisma.articleComment.create({
+      data:{
+        ...commentData,
+        articleId,
+        userId,
+      }
+    });
+  };
 };
 
 main()
