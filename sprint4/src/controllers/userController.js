@@ -26,7 +26,7 @@ export const login = async (req, res, next) => {
     const response = {
       ...user,
       accessToken,
-      message : "로그인에 성공했습니다"
+      message: "로그인에 성공했습니다"
     }
     return res.status(201).json(response);
     // return res.json({ accessToken });
@@ -35,3 +35,39 @@ export const login = async (req, res, next) => {
     next(error);
   }
 }
+
+export const getUserInfo = async (req, res, next) => {
+  try {
+    const userId = req.user.userId;
+    const userInfo = await userService.getUserInfo(userId);
+    res.status(201).json(userInfo);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateUserInfo = async (req, res, next) => {
+  try {
+    const userId = req.user.userId;
+    const userData = req.body;
+    const updatedUserInfo = await userService.updateUserInfo(userId, userData);
+    res.status(201).json(updatedUserInfo);
+  } catch (error) {
+    next(error)
+  }
+};
+
+export const updateUserPassword = async (req, res, next) => {
+  try {
+    const userId = req.user.userId;
+    const { password, salt } = await hashPassword(req.body.password);
+    const updatedPassword = await userService.updateUserPassword(userId, { password, salt });
+    res.status(201).json({
+      ...updatedPassword,
+      message: "비밀번호가 변경되었습니다" 
+    });
+  } catch (error) {
+
+  }
+}
+

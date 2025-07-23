@@ -46,7 +46,10 @@ export const getProduct = async (req, res) => {
 
 export const createProduct = async (req, res) => {
     const product = await prisma.product.create({
-        data: req.body,
+        data: {
+            ...req.body,
+            userId: req.user.userId,
+        },
     });
     res.status(201).send(product);
 };
@@ -56,7 +59,10 @@ export const patchProduct = async (req, res) => {
     const { id } = req.params;
     const product = await prisma.product.update({
         where: { id },
-        data: req.body,
+        data: {
+            ...req.body,
+            userId: req.user.userId,
+        }
     });
     res.status(202).send(product);
 };

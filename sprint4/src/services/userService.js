@@ -41,13 +41,46 @@ const getUser = async (email, password) => {
   return filterSensitiveUserDate(user);
 };
 
+const getUserInfo = async (userId) => {
+  if (!userId) {
+    const error = new Error('존재하지 않는 유저입니다');
+    error.code = 401;
+    throw error;
+  }
+  const userInfo = await userRepository.findById(userId);
+  return filterSensitiveUserDate(userInfo);
+};
+
+const updateUserInfo = async (userId, userData) => {
+  if (!userId) {
+    const error = new Error('존재하지 않는 유저입니다');
+    error.code = 401;
+    throw error;
+  }
+  const updateUserInfo = await userRepository.update(userId, userData);
+  return filterSensitiveUserDate(updateUserInfo);
+};
+
+const updateUserPassword = async (userId, data) => {
+  if (!userId) {
+    const error = new Error('존재하지 않는 유저입니다');
+    error.code = 401;
+    throw error;
+  }
+
+  const updatePassword = await userRepository.update(userId, data);
+  return filterSensitiveUserDate(updatePassword);
+}
+
 const filterSensitiveUserDate = (userData) => {
   const { password, salt, ...unsensitiveData } = userData;
   return unsensitiveData;
 };
-
 export default {
   createToken,
   createUser,
   getUser,
+  getUserInfo,
+  updateUserInfo,
+  updateUserPassword,
 };
