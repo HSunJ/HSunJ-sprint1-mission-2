@@ -1,6 +1,6 @@
 import express from "express";
 
-import { createUser, login, getUserInfo, updateUserInfo, updateUserPassword, getUserProducts } from "../controllers/userController.js";
+import { createUser, login, refreshToken, getUserInfo, updateUserInfo, updateUserPassword, getUserProducts } from "../controllers/userController.js";
 import auth from "../middlewares/auth.js";
 
 const userRouter = express.Router();
@@ -10,6 +10,9 @@ userRouter.route('/')
 
 userRouter.route('/login')
   .post(login)
+
+userRouter.route('/token/refresh')
+  .post(auth.verifyRefreshToken, refreshToken)
 
 userRouter.route('/info')
   .get(auth.verifyAccessToken, getUserInfo)

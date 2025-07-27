@@ -5,11 +5,21 @@ import userRepository from "../repositories/userRepository.js";
 import productRepository from "../repositories/productRepository.js";
 import { checkPassword } from "../utils/hash.js";
 
-const createToken = async (user) => {
+const createToken = async (user, type) => {
   const payload = { userId: user.id }
-  const options = { expiresIn: '1h' }
+  const options = { expiresIn: type === 'refresh' ? '2w' : '1h' }
   return jwt.sign(payload, process.env.JWT_SECRET, options);
 };
+
+const refreshToken = async (userId, refreshToken) => {
+  const user = await userRepository.findById(userId);
+  if(user.refreshToken !== refreshToken){
+    const error = new Error("인증 실패");
+    error.code = 401;
+    throw error;
+  }
+  return createToken(user);
+}
 
 const createUser = async (user) => {
   const isExistUser = await userRepository.findByEmail(user.email);
@@ -84,11 +94,12 @@ const getProducts = async (userId) => {
 }
 
 const filterSensitiveUserDate = (userData) => {
-  const { password, salt, ...unsensitiveData } = userData;
+  const { password, salt, refreshToken,  ...unsensitiveData } = userData;
   return unsensitiveData;
 };
 export default {
   createToken,
+  refreshToken,
   createUser,
   getUser,
   getUserInfo,

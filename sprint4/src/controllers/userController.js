@@ -22,16 +22,38 @@ export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
     const user = await userService.getUser(email, password);
+    // 로그인할때 액세스토큰과 리프래시토큰 발급
     const accessToken = await userService.createToken(user);
+    const refreshToken = await userService.createToken(user, 'refresh');
+    // 리프래시토큰 db에 저장
+    await userService.updateUserInfo(user.id, { refreshToken });
+
+    // 리프레시 토큰을 쿠키에 담아 전달
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      sameSite: 'none',
+      secure: true
+    });
     const response = {
       ...user,
       accessToken,
       message: "로그인에 성공했습니다"
-    }
+    };
     return res.status(201).json(response);
     // return res.json({ accessToken });
     // return res.status(201).json(user);
   } catch (error) {
+    next(error);
+  }
+}
+
+export const refreshToken = async (req, res, next) => {
+  try {
+    const refreshToken = req.cookies.refreshToken;
+    const userId = req.user.userId;
+    const newAccessToken = await userService.refreshToken(userId, refreshToken);
+    return res.json({ newAccessToken });
+  } catch (error){
     next(error);
   }
 }

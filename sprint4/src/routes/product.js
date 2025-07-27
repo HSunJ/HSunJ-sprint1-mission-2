@@ -4,22 +4,26 @@ import { validateProduct } from '../middlewares/validateProduct.js';
 import { asyncHandler } from '../middlewares/asyncHandler.js';
 import auth from '../middlewares/auth.js';
 
-import { getProducts, getProduct, createProduct, patchProduct, deleteProduct } from '../controllers/productController.js';
+import { getProducts, getProduct, createProduct, patchProduct, deleteProduct, likeProduct } from '../controllers/productController.js';
 
 const productRouter = express.Router();
 
 productRouter.route('/')
-    .get(asyncHandler(getProducts))
+    .get(auth.verifyAccessTokenOptional,
+        asyncHandler(getProducts))
     .post(validateProduct, 
         auth.verifyAccessToken, 
         asyncHandler(createProduct));
 
 
 productRouter.route('/:id')
-    .get(asyncHandler(getProduct))
+    .get(auth.verifyAccessTokenOptional,
+        asyncHandler(getProduct))
     .patch(auth.verifyAccessToken,
         asyncHandler(patchProduct))
     .delete(auth.verifyAccessToken,
-        asyncHandler(deleteProduct));
+        asyncHandler(deleteProduct))
+    .post(auth.verifyAccessToken, 
+        likeProduct)
 
 export default productRouter;

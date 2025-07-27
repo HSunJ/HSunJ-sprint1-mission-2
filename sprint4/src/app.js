@@ -1,5 +1,6 @@
 import * as dotenv from 'dotenv';
 import express from 'express';
+import cookieParser from 'cookie-parser';
 import path from 'path';
 import cors from 'cors';
 import { Prisma } from '@prisma/client';
@@ -17,6 +18,7 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 app.use(cors());
+app.use(cookieParser());
 
 const filename = fileURLToPath(import.meta.url);
 const dir = path.dirname(filename);
