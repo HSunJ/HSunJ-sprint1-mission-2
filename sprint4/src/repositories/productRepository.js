@@ -3,8 +3,16 @@ import prisma from "../config/prisma.js";
 async function getById(id) {
   return await prisma.product.findUnique({
     where: {
-      id: parseInt(id, 10),
+      id,
     },
+  });
+}
+
+async function getListById(id){
+  return await prisma.product.findMany({
+    where: {
+      userId: id,
+    }
   });
 }
 
@@ -20,5 +28,6 @@ async function save(product) {
 
 export default {
   getById,
+  getListById,
   save,
 };

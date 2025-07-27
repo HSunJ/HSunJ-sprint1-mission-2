@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import jwt from 'jsonwebtoken';
 
 import userRepository from "../repositories/userRepository.js";
+import productRepository from "../repositories/productRepository.js";
 import { checkPassword } from "../utils/hash.js";
 
 const createToken = async (user) => {
@@ -72,6 +73,16 @@ const updateUserPassword = async (userId, data) => {
   return filterSensitiveUserDate(updatePassword);
 }
 
+const getProducts = async (userId) => {
+  if (!userId) {
+    const error = new Error('존재하지 않는 유저입니다');
+    error.code = 401;
+    throw error;
+  }
+
+  return await productRepository.getListById(userId);
+}
+
 const filterSensitiveUserDate = (userData) => {
   const { password, salt, ...unsensitiveData } = userData;
   return unsensitiveData;
@@ -83,4 +94,5 @@ export default {
   getUserInfo,
   updateUserInfo,
   updateUserPassword,
+  getProducts,
 };

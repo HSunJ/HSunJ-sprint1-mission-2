@@ -1,6 +1,6 @@
 import express from "express";
 
-import { createUser, login, getUserInfo, updateUserInfo, updateUserPassword } from "../controllers/userController.js";
+import { createUser, login, getUserInfo, updateUserInfo, updateUserPassword, getUserProducts } from "../controllers/userController.js";
 import auth from "../middlewares/auth.js";
 
 const userRouter = express.Router();
@@ -17,6 +17,9 @@ userRouter.route('/info')
 
 userRouter.route('/info/password')
   .patch(auth.verifyAccessToken, updateUserPassword)
+
+userRouter.route('/info/products')
+  .get(auth.verifyAccessToken, getUserProducts)
   
 
 export default userRouter;

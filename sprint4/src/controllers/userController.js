@@ -64,10 +64,20 @@ export const updateUserPassword = async (req, res, next) => {
     const updatedPassword = await userService.updateUserPassword(userId, { password, salt });
     res.status(201).json({
       ...updatedPassword,
-      message: "비밀번호가 변경되었습니다" 
+      message: "비밀번호가 변경되었습니다"
     });
   } catch (error) {
+    next(error);
+  }
+};
 
+export const getUserProducts = async (req, res, next) => {
+  try {
+    const userId = req.user.userId;
+    const productList = await userService.getProducts(userId);
+    res.status(200).json(productList);
+  } catch (error) {
+    next(error);
   }
 }
 
