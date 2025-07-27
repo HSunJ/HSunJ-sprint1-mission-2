@@ -68,8 +68,9 @@ export const getProduct = async (req, res) => {
     if (product.likedUser?.length > 0) {
         product.isLiked = true;
     }
+    const { likedUser, ...productData } = product;
 
-    res.status(200).send(filterResponse(product));
+    res.status(200).send(productData);
 };
 
 export const createProduct = async (req, res) => {
@@ -141,9 +142,4 @@ export const likeProduct = async (req, res) => {
         });
         res.status(201).json({ message: "좋아요를 눌렀습니다" });
     }
-}
-
-const filterResponse = (data) => {
-    const { likedUser, ...rest } = data
-    return rest;
 }
