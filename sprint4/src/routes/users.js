@@ -1,6 +1,6 @@
 import express from "express";
 
-import { createUser, login, refreshToken, getUserInfo, updateUserInfo, updateUserPassword, getUserProducts } from "../controllers/userController.js";
+import { createUser, login, refreshToken, getUserInfo, updateUserInfo, updateUserPassword, getUserProducts, getLikedProducts } from "../controllers/userController.js";
 import auth from "../middlewares/auth.js";
 
 const userRouter = express.Router();
@@ -23,6 +23,9 @@ userRouter.route('/info/password')
 
 userRouter.route('/info/products')
   .get(auth.verifyAccessToken, getUserProducts)
+
+userRouter.route('/info/likedProducts')
+  .get(auth.verifyAccessToken, getLikedProducts)
   
 
 export default userRouter;

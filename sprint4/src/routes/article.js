@@ -8,13 +8,15 @@ import auth from '../middlewares/auth.js';
 const articleRouter = express.Router();
 
 articleRouter.route('/')
-    .get(asyncHandler(getArticles))
+    .get(auth.verifyAccessTokenOptional,
+        asyncHandler(getArticles))
     .post(validateArticle, 
         auth.verifyAccessToken, 
         asyncHandler(createArticle));
 
 articleRouter.route('/:id')
-    .get(asyncHandler(getArticle))
+    .get(auth.verifyAccessTokenOptional,
+        asyncHandler(getArticle))
     .patch(auth.verifyAccessToken,
         asyncHandler(patchArticle))
     .delete(auth.verifyAccessToken,

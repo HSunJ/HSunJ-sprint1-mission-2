@@ -16,15 +16,6 @@ async function getListById(id) {
   });
 }
 
-async function getLikedList(id) {
-  return await prisma.product.findMany({
-    where: {
-      userId: id,
-      
-    }
-  });
-}
-
 async function save(product) {
   return await prisma.product.create({
     data: {
@@ -38,6 +29,5 @@ async function save(product) {
 export default {
   getById,
   getListById,
-  getLikedList,
   save,
 };

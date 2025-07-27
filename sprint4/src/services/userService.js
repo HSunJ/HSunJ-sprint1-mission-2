@@ -13,7 +13,7 @@ const createToken = async (user, type) => {
 
 const refreshToken = async (userId, refreshToken) => {
   const user = await userRepository.findById(userId);
-  if(user.refreshToken !== refreshToken){
+  if (user.refreshToken !== refreshToken) {
     const error = new Error("인증 실패");
     error.code = 401;
     throw error;
@@ -90,11 +90,73 @@ const getProducts = async (userId) => {
     throw error;
   }
 
-  return await productRepository.getListById(userId);
+  let productList = await userRepository.getProductById(userId);
+  productList = productList.createdProducts.map((product) => {
+    const isLiked = product.likedUser.length > 0 ? true : false;
+    const { likedUser, ...rest } = product;
+    return {
+      ...rest,
+      isLiked
+    };
+  })
+
+  return productList;
+}
+
+const getLikedProductList = async (userId) => {
+  if (!userId) {
+    const error = new Error('존재하지 않는 유저입니다');
+    error.code = 401;
+    throw error;
+  }
+  let likedProductList = await userRepository.getLikedProductList(userId);
+  likedProductList = likedProductList.likedProducts.map((product) => {
+    return {
+      ...product,
+      isLiked: true
+    }
+  })
+  return likedProductList
+}
+
+const getArticles = async (userId) => {
+  if (!userId) {
+    const error = new Error('존재하지 않는 유저입니다');
+    error.code = 401;
+    throw error;
+  }
+
+  let articleList = await userRepository.getArticleById(userId);
+  articleList = articleList.createdArticles.map((article) => {
+    const isLiked = article.likedUser.length > 0 ? true : false;
+    const { likedUser, ...rest } = article;
+    return {
+      ...rest,
+      isLiked
+    };
+  })
+
+  return articleList;
+}
+
+const getLikedArticleList = async (userId) => {
+  if (!userId) {
+    const error = new Error('존재하지 않는 유저입니다');
+    error.code = 401;
+    throw error;
+  }
+  let likedArticleList = await userRepository.getLikedArticleList(userId);
+  likedArticleList = likedArticleList.likedArticles.map((article) => {
+    return {
+      ...article,
+      isLiked: true
+    }
+  })
+  return likedArticleList
 }
 
 const filterSensitiveUserDate = (userData) => {
-  const { password, salt, refreshToken,  ...unsensitiveData } = userData;
+  const { password, salt, refreshToken, ...unsensitiveData } = userData;
   return unsensitiveData;
 };
 export default {
@@ -106,4 +168,7 @@ export default {
   updateUserInfo,
   updateUserPassword,
   getProducts,
+  getLikedProductList,
+  getArticles,
+  getLikedArticleList,
 };

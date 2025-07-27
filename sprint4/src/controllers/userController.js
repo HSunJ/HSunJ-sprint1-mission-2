@@ -53,7 +53,7 @@ export const refreshToken = async (req, res, next) => {
     const userId = req.user.userId;
     const newAccessToken = await userService.refreshToken(userId, refreshToken);
     return res.json({ newAccessToken });
-  } catch (error){
+  } catch (error) {
     next(error);
   }
 }
@@ -98,6 +98,27 @@ export const getUserProducts = async (req, res, next) => {
     const userId = req.user.userId;
     const productList = await userService.getProducts(userId);
     res.status(200).json(productList);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export const getLikedProducts = async (req, res, next) => {
+  try {
+    const userId = req.user.userId;
+    const likedProductList = await userService.getLikedProductList(userId);
+    res.status(200).json(likedProductList);
+  }
+  catch (error) {
+    next(error);
+  }
+}
+
+export const getUserArticles = async (req, res, next) => {
+  try {
+    const userId = req.user.userId;
+    const artucleList = await userService.getArticles(userId);
+    res.status(200).json(artucleList);
   } catch (error) {
     next(error);
   }
