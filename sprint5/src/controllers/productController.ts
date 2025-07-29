@@ -6,24 +6,17 @@ import prisma from "../config/prisma";
 
 import { ProductListItem, DisplayProductListItem, ProductDetail, DisplayProductDetail, CreatedProductListItem } from "../types/product";
 import productRepository from "../repositories/productRepository";
-import userRepository from "../repositories/userRepository";
 
 export const getProducts: RequestHandler = async (req, res) => {
   const { offset = 0, limit = 10, order = "recent", keyword = "" } = req.query;
-  const orderBy: Prisma.ProductOrderByWithRelationInput = order === 'recent' ? { createdAt: 'desc' } : { createdAt: 'asc' };
   const userId = req.user?.userId;
 
-  const products: ProductListItem[] = productRepository.getList(userId, {
-    where: keyword ? {
-      OR: [
-        { name: { contains: keyword, mode: 'insensitive' } },
-        { description: { contains: keyword, mode: 'insensitive' } }
-      ]
-    } : undefined,
-    orderBy,
+  const products: ProductListItem[] = await productRepository.getList(userId, {
+    keyword: keyword as string,
+    order: order as string,
     offset: Number(offset),
     limit: Number(limit)
-  })
+  });
 
   const displayProductList: DisplayProductListItem[] = products.map((product) => {
     return {

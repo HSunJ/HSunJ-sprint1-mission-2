@@ -21,8 +21,8 @@ export type DisplayProductListItem = ProductListItem & Liked;
 export type GetProductListParams = {
   offset?: number;
   limit?: number;
-  orderBy?: { createdAt: 'desc' } | { createdAt: 'asc' };
-  where?: { name: string } | { description: string };
+  order?: string;
+  keyword?: string;
 };
 
 // Product 상세 조회 시 보여줄 상품 정보 타입

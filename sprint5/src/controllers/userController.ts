@@ -1,8 +1,8 @@
-import userRepository from "../repositories/userRepository.js";
-import userService from "../services/userService.js";
-import { hashPassword } from "../utils/hash.js";
+import userService from "../services/userService";
+import { hashPassword } from "../utils/hash";
+import { RequestHandler } from "express";
 
-export const createUser = async (req, res, next) => {
+export const createUser: RequestHandler = async (req, res, next) => {
   try {
     const { password, salt } = await hashPassword(req.body.password);
     const userData = {
@@ -18,7 +18,7 @@ export const createUser = async (req, res, next) => {
   }
 }
 
-export const login = async (req, res, next) => {
+export const login: RequestHandler = async (req, res, next) => {
   try {
     const { email, password } = req.body;
     const user = await userService.getUser(email, password);
@@ -47,7 +47,7 @@ export const login = async (req, res, next) => {
   }
 }
 
-export const refreshToken = async (req, res, next) => {
+export const refreshToken: RequestHandler = async (req, res, next) => {
   try {
     const refreshToken = req.cookies.refreshToken;
     const userId = req.user.userId;
@@ -58,7 +58,7 @@ export const refreshToken = async (req, res, next) => {
   }
 }
 
-export const getUserInfo = async (req, res, next) => {
+export const getUserInfo: RequestHandler = async (req, res, next) => {
   try {
     const userId = req.user.userId;
     const userInfo = await userService.getUserInfo(userId);
@@ -68,7 +68,7 @@ export const getUserInfo = async (req, res, next) => {
   }
 };
 
-export const updateUserInfo = async (req, res, next) => {
+export const updateUserInfo: RequestHandler = async (req, res, next) => {
   try {
     const userId = req.user.userId;
     const userData = req.body;
@@ -79,7 +79,7 @@ export const updateUserInfo = async (req, res, next) => {
   }
 };
 
-export const updateUserPassword = async (req, res, next) => {
+export const updateUserPassword: RequestHandler = async (req, res, next) => {
   try {
     const userId = req.user.userId;
     const { password, salt } = await hashPassword(req.body.password);
@@ -93,7 +93,7 @@ export const updateUserPassword = async (req, res, next) => {
   }
 };
 
-export const getUserProducts = async (req, res, next) => {
+export const getUserProducts: RequestHandler = async (req, res, next) => {
   try {
     const userId = req.user.userId;
     const productList = await userService.getProducts(userId);
@@ -103,7 +103,7 @@ export const getUserProducts = async (req, res, next) => {
   }
 }
 
-export const getLikedProducts = async (req, res, next) => {
+export const getLikedProducts: RequestHandler = async (req, res, next) => {
   try {
     const userId = req.user.userId;
     const likedProductList = await userService.getLikedProductList(userId);
@@ -114,7 +114,7 @@ export const getLikedProducts = async (req, res, next) => {
   }
 }
 
-export const getUserArticles = async (req, res, next) => {
+export const getUserArticles: RequestHandler = async (req, res, next) => {
   try {
     const userId = req.user.userId;
     const artucleList = await userService.getArticles(userId);
