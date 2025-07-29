@@ -5,10 +5,11 @@
   "license": "ISC",
   "author": "",
   "type": "module",
-  "main": "src/app.js",
+  "main": "dist/app.js",
   "scripts": {
     "start": "node app.js",
-    "dev": "nodemon app.js"
+    "dev": "nodemon --watch ./src --exec ts-node ./src/app.ts",
+    "build": "tsc"
   },
   "dependencies": {
     "@prisma/client": "^6.10.1",
@@ -28,8 +29,14 @@
     "superstruct": "^1.0.3"
   },
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "@types/cookie-parser": "^1.4.9",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/multer": "^2.0.0",
     "nodemon": "^3.1.0",
-    "prisma": "^6.10.1"
+    "prisma": "^6.10.1",
+    "typescript": "^5.8.3"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
