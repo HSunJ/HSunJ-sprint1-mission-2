@@ -1,0 +1,49 @@
+
+import { User, Product, Article } from "@prisma/client";
+
+// 좋아요 여부를 나타내는 타입
+type Liked = {
+  isLiked: boolean;
+};
+
+// 조회한 Product 리스트
+export type ProductListItem = {
+  id: string;
+  name: string;
+  price: number;
+  createdAt: Date;
+  likedUser?: { id: string }[];
+};
+
+// Product List에서 보여줄 상품 정보
+export type DisplayProductListItem = ProductListItem & Liked;
+
+export type GetProductListParams = {
+  offset?: number;
+  limit?: number;
+  orderBy?: { createdAt: 'desc' } | { createdAt: 'asc' };
+  where?: { name: string } | { description: string };
+};
+
+// Product 상세 조회 시 보여줄 상품 정보 타입
+export type ProductDetail = {
+  id: string;
+  name: string;
+  description: string | null;
+  price: number;
+  tags: string | null;
+  createdAt: Date;
+  likedUser?: { id: string }[];
+};
+// Product 상세 조회 시 보여줄 상품 정보 타입
+export type DisplayProductDetail = ProductDetail & Liked;
+
+// User가 생성한 상품 목록에서 보여줄 상품 정보 타입 (ProductListItem과 유사)
+export type CreatedProductListItem = {
+  id: string;
+  name: string;
+  price: number;
+  createdAt: Date;
+  isLiked: boolean; // 좋아요 여부 추가
+};
+
