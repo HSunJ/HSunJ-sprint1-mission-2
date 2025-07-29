@@ -1,53 +1,47 @@
-import { PrismaClient } from "@prisma/client";
-import { PatchProduct } from '../structs.js';
-import { assert } from "superstruct";
+import { Prisma } from "@prisma/client";
+import { PatchProduct } from '../structs';
+import { assert, is } from "superstruct";
+import { RequestHandler } from "express";
+import prisma from "../config/prisma";
 
-import productRepository from "../repositories/productRepository.js";
-import userRepository from "../repositories/userRepository.js";
+import { ProductListItem, DisplayProductListItem, ProductDetail, DisplayProductDetail, CreatedProductListItem } from "../types/product";
+import productRepository from "../repositories/productRepository";
+import userRepository from "../repositories/userRepository";
 
-const prisma = new PrismaClient();
-
-export const getProducts = async (req, res) => {
+export const getProducts: RequestHandler = async (req, res) => {
   const { offset = 0, limit = 10, order = "recent", keyword = "" } = req.query;
-  const orderBy = order === 'recent' ? { createdAt: 'desc' } : { createdAt: 'asc' };
+  const orderBy: Prisma.ProductOrderByWithRelationInput = order === 'recent' ? { createdAt: 'desc' } : { createdAt: 'asc' };
   const userId = req.user?.userId;
 
-  const products = await prisma.product.findMany({
-    select: {
-      id: true,
-      name: true,
-      price: true,
-      createdAt: true,
-      likedUser: userId ? { where: { id: userId } } : false
-    },
-    where: {
+  const products: ProductListItem[] = productRepository.getList(userId, {
+    where: keyword ? {
       OR: [
         { name: { contains: keyword, mode: 'insensitive' } },
         { description: { contains: keyword, mode: 'insensitive' } }
       ]
-    },
+    } : undefined,
     orderBy,
-    skip: parseInt(offset),
-    take: parseInt(limit),
-  });
+    offset: Number(offset),
+    limit: Number(limit)
+  })
 
-  const productList = products.map((product) => {
+  const displayProductList: DisplayProductListItem[] = products.map((product) => {
     return {
       id: product.id,
       name: product.name,
       price: product.price,
       createdAt: product.createdAt,
-      isLiked: product.likedUser?.length > 0 ? true : false
+      isLiked: product.likedUser ? product.likedUser.length > 0 : false
     }
   });
-  res.status(200).send(productList);
+  res.status(200).send(displayProductList);
 };
 
-export const getProduct = async (req, res) => {
+export const getProduct: RequestHandler = async (req, res) => {
   const { id } = req.params;
   const userId = req.user?.userId;
 
-  const product = await prisma.product.findUniqueOrThrow({
+  const product: ProductDetail = await prisma.product.findUniqueOrThrow({
     select: {
       id: true,
       name: true,
@@ -63,16 +57,21 @@ export const getProduct = async (req, res) => {
     where: { id },
   });
 
-  product.isLiked = false;
-  if (product.likedUser?.length > 0) {
-    product.isLiked = true;
+  const isLiked = product.likedUser ? product.likedUser.length > 0 : false;
+  const displayProduct: DisplayProductDetail = {
+    id: product.id,
+    name: product.name,
+    description: product.description,
+    price: product.price,
+    tags: product.tags,
+    createdAt: product.createdAt,
+    isLiked
   }
-  const { likedUser, ...productData } = product;
 
-  res.status(200).send(productData);
+  res.status(200).send(displayProduct);
 };
 
-export const createProduct = async (req, res) => {
+export const createProduct: RequestHandler = async (req, res) => {
   const product = await prisma.product.create({
     data: {
       ...req.body,
@@ -82,7 +81,7 @@ export const createProduct = async (req, res) => {
   res.status(201).send(product);
 };
 
-export const patchProduct = async (req, res) => {
+export const patchProduct: RequestHandler = async (req, res) => {
   assert(req.body, PatchProduct);
   const { id } = req.params;
   const product = await prisma.product.update({
@@ -95,7 +94,7 @@ export const patchProduct = async (req, res) => {
   res.status(202).send(product);
 };
 
-export const deleteProduct = async (req, res) => {
+export const deleteProduct: RequestHandler = async (req, res) => {
   const { id } = req.params;
   await prisma.product.delete({
     where: { id },
@@ -103,7 +102,7 @@ export const deleteProduct = async (req, res) => {
   res.sendStatus(204);
 };
 
-export const likeProduct = async (req, res) => {
+export const likeProduct: RequestHandler = async (req, res) => {
   const userId = req.user.userId;
   const id = req.params.id;
   const product = await prisma.product.findUnique({

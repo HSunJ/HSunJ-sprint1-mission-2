@@ -1,16 +1,16 @@
 // import * as dotenv from 'dotenv';
 import express from 'express';
-import { validateProduct } from '../middlewares/validateProduct.js';
-import { asyncHandler } from '../middlewares/asyncHandler.js';
+import { validateProduct } from '../middlewares/validateProduct';
+import { asyncHandler } from '../middlewares/asyncHandler';
 import auth from '../middlewares/auth.js';
 
-import { getProducts, getProduct, createProduct, patchProduct, deleteProduct, likeProduct } from '../controllers/productController.js';
+import { getProductList, getProduct, createProduct, patchProduct, deleteProduct, likeProduct } from '../controllers/productController.js';
 
 const productRouter = express.Router();
 
 productRouter.route('/')
     .get(auth.verifyAccessTokenOptional,
-        asyncHandler(getProducts))
+        asyncHandler(getProductList))
     .post(validateProduct, 
         auth.verifyAccessToken, 
         asyncHandler(createProduct));
