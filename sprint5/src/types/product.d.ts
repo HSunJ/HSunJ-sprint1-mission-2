@@ -1,5 +1,4 @@
-
-import { User, Product, Article } from "@prisma/client";
+import { User, Product, Article, $Enums } from "@prisma/client";
 
 // 좋아요 여부를 나타내는 타입
 type Liked = {
@@ -25,25 +24,30 @@ export type GetProductListParams = {
   keyword?: string;
 };
 
-// Product 상세 조회 시 보여줄 상품 정보 타입
+// Product 상세 조회 타입
 export type ProductDetail = {
   id: string;
   name: string;
   description: string | null;
   price: number;
-  tags: string | null;
+  tag: $Enums.Tags | null;
   createdAt: Date;
   likedUser?: { id: string }[];
 };
+
 // Product 상세 조회 시 보여줄 상품 정보 타입
 export type DisplayProductDetail = ProductDetail & Liked;
 
-// User가 생성한 상품 목록에서 보여줄 상품 정보 타입 (ProductListItem과 유사)
-export type CreatedProductListItem = {
+export type ProductCreateInput = {
+  name: string;
+  description?: string | null;
+  price: number;
+  tag?: $Enums.Tags | null;
+};
+// User가 생성한 상품 목록에서 보여줄 상품 정보 타입
+export type DisplayCreateProduct = {
   id: string;
   name: string;
   price: number;
   createdAt: Date;
-  isLiked: boolean; // 좋아요 여부 추가
 };
-
