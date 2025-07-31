@@ -1,7 +1,7 @@
 // import * as dotenv from 'dotenv';
 import express from 'express';
 import { validateProduct } from '../middlewares/validateProduct';
-import { asyncHandler } from '../middlewares/asyncHandler';
+import { asyncHandler } from '../middlewares/asyncHandler.ts';
 import auth from '../middlewares/auth.js';
 
 import { getProductList, getProduct, createProduct, patchProduct, deleteProduct, likeProduct } from '../controllers/productController.js';

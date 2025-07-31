@@ -56,7 +56,7 @@ export const getProduct = async (req, res) => {
       name: true,
       description: true,
       price: true,
-      tags: true,
+      tag: true,
       likedUser: userId ? {
         where: { id: userId },
         select: { id: true }

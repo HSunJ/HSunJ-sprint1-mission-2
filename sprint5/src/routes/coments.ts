@@ -1,5 +1,5 @@
 import express from 'express';
-import { asyncHandler } from '../middlewares/asyncHandler.js';
+import { asyncHandler } from '../middlewares/asyncHandler.ts';
 import { getProductComments, createProductComment, patchProductComment, deleteProductComment, getArticleComments, createArticleComment, patchArticleComment, deleteArticleComment } from '../controllers/commentController.js';
 import auth from '../middlewares/auth.js';
 

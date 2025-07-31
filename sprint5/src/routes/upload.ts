@@ -3,7 +3,7 @@ import multer from "multer";
 import path from "path";
 import fs from 'fs';
 import { fileURLToPath } from "url";
-import { asyncHandler } from "../middlewares/asyncHandler.js";
+import { asyncHandler } from "../middlewares/asyncHandler.ts";
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);

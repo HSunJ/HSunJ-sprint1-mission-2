@@ -1,15 +1,15 @@
 import * as dotenv from 'dotenv';
-import express from 'express';
+import express, { Request, Response, NextFunction, Errback, ErrorRequestHandler } from 'express';
 import cookieParser from 'cookie-parser';
 import path from 'path';
 import cors from 'cors';
 import { Prisma } from '@prisma/client';
 
-import productRouter from './routes/product.js';
-import articleRouter from './routes/article.js';
-import uploadRouter from './routes/upload.js';
-import commentRouter from './routes/coments.js';
-import userRouter from './routes/users.js';
+import productRouter from './routes/product';
+import articleRouter from './routes/article';
+import uploadRouter from './routes/upload';
+import commentRouter from './routes/coments';
+import userRouter from './routes/users';
 import { fileURLToPath } from 'url';
 
 
@@ -32,7 +32,7 @@ app.use('/files', uploadRouter);
 app.use('/users', userRouter);
 
 
-app.use('/', (err, req, res, next) => {
+app.use('/', (err: Error, req: Request, res: Response, next: NextFunction) => {
   if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2025') {
     return res.status(404).json({ message: '요청한 리소스를 찾을 수 없습니다.' });
   }

@@ -34,7 +34,7 @@ model Product {
   name        String
   description String?
   price       Float
-  tags        Tags?
+  tag         Tags?
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
   coments     ProductComment[]

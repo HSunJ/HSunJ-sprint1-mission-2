@@ -1,7 +1,7 @@
 // import * as dotenv from 'dotenv';
 import express from 'express';
 import { validateArticle } from '../middlewares/validateArticle.js';
-import { asyncHandler } from '../middlewares/asyncHandler.js';
+import { asyncHandler } from '../middlewares/asyncHandler.ts/index.js';
 import { getArticles, getArticle, createArticle, patchArticle, deleteArticle } from '../controllers/articleController.js';
 import auth from '../middlewares/auth.js';
 
