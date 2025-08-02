@@ -62,11 +62,17 @@ async function createProduct(productInput: ProductCreateInput, userId: string | 
     data: {
       ...productInput,
       author: { connect: { id: userId } }
+    },
+    select: {
+      id: true,
+      name: true,
+      price: true,
+      createdAt: true
     }
   });
 }
 
-const patchProduct = async (id: string, userId: string | undefined, data: Prisma.ProductUpdateInput): Promise<ProductDetail | null> => {
+const patchProduct = async (id: string, userId: string | undefined, data: Partial<ProductCreateInput>): Promise<ProductDetail | null> => {
   return await prisma.product.update({
     where: {
       id,
