@@ -20,8 +20,23 @@ class BadRequestError extends AppError {
     super(message, 400);
   }
 }
+
+class UnauthorizedError extends AppError {
+  constructor(message: string = "Unauthorized") {
+    super(message, 401);
+  }
+}
+
+class ConflictError extends AppError {
+  constructor(message: string = "Conflict", data?: any) {
+    super(message, 409);
+  }
+}
+
 export default {
   AppError,
   NotFoundError,
   BadRequestError,
+  UnauthorizedError,
+  ConflictError
 };

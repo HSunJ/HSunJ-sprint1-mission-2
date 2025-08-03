@@ -1,174 +1,44 @@
-import bcrypt from "bcrypt";
 import jwt from 'jsonwebtoken';
+import { User } from "@prisma/client";
 
 import userRepository from "../repositories/userRepository.js";
-import productRepository from "../repositories/productRepository.js";
-import { checkPassword } from "../utils/hash.js";
+import appError from "../utils/appError";
+import { DisplayUserProfile } from "../types/user.js";
 
-const createToken = async (user, type) => {
+
+const createToken = async (user: DisplayUserProfile, type: 'access' | 'refresh') => {
   const payload = { userId: user.id }
-  const options = { expiresIn: type === 'refresh' ? '2w' : '1h' }
-  return jwt.sign(payload, process.env.JWT_SECRET, options);
+  const options = { expiresIn: type === 'refresh' ? '2w' : '12h' } as jwt.SignOptions;
+  return jwt.sign(payload, process.env.JWT_SECRET as string, options);
 };
 
-const refreshToken = async (userId, refreshToken) => {
+const refreshToken = async (userId: string, refreshToken: string) => {
   const user = await userRepository.findById(userId);
-  if (user.refreshToken !== refreshToken) {
-    const error = new Error("인증 실패");
-    error.code = 401;
-    throw error;
-  }
-  return createToken(user);
-}
-
-const createUser = async (user) => {
-  const isExistUser = await userRepository.findByEmail(user.email);
-
-  if (isExistUser) {
-    const error = new Error("이미 존재하는 유저입니다.");
-    error.code = 422;
-    error.data = { email: user.email };
-    throw error;
-  };
-
-  const newUser = await userRepository.save(user);
-  return filterSensitiveUserDate(newUser);
-};
-
-const getUser = async (email, password) => {
-  const user = await userRepository.findByEmail(email);
   if (!user) {
-    const error = new Error('존재하지 않는 유저입니다');
-    error.code = 401;
-    throw error;
-  };
-
-  if (!checkPassword(password, user.password)) {
-    const error = new Error('비밀번호가 틀렸습니다');
-    error.code = 401;
-    throw error;
-  };
-
-  return filterSensitiveUserDate(user);
-};
-
-const getUserInfo = async (userId) => {
-  if (!userId) {
-    const error = new Error('존재하지 않는 유저입니다');
-    error.code = 401;
-    throw error;
-  }
-  const userInfo = await userRepository.findById(userId);
-  return filterSensitiveUserDate(userInfo);
-};
-
-const updateUserInfo = async (userId, userData) => {
-  if (!userId) {
-    const error = new Error('존재하지 않는 유저입니다');
-    error.code = 401;
-    throw error;
-  }
-  const updateUserInfo = await userRepository.update(userId, userData);
-  return filterSensitiveUserDate(updateUserInfo);
-};
-
-const updateUserPassword = async (userId, data) => {
-  if (!userId) {
-    const error = new Error('존재하지 않는 유저입니다');
-    error.code = 401;
-    throw error;
+    throw new appError.NotFoundError("존재하지 않는 유저입니다"); 
   }
 
-  const updatePassword = await userRepository.update(userId, data);
-  return filterSensitiveUserDate(updatePassword);
+  if (user.refreshToken !== refreshToken) {
+    throw new appError.UnauthorizedError("유효하지 않은 리프레시 토큰입니다");
+  }
+  return createToken(user, 'access');
 }
 
-const getProducts = async (userId) => {
-  if (!userId) {
-    const error = new Error('존재하지 않는 유저입니다');
-    error.code = 401;
-    throw error;
+const checkExistingUser = async (email: string): Promise<boolean> => {
+  const user = await userRepository.findByEmail(email);
+  if (user) {
+    return true;
   }
-
-  let productList = await userRepository.getProductById(userId);
-  productList = productList.createdProducts.map((product) => {
-    const isLiked = product.likedUser.length > 0 ? true : false;
-    const { likedUser, ...rest } = product;
-    return {
-      ...rest,
-      isLiked
-    };
-  })
-
-  return productList;
+  return false;
 }
 
-const getLikedProductList = async (userId) => {
-  if (!userId) {
-    const error = new Error('존재하지 않는 유저입니다');
-    error.code = 401;
-    throw error;
-  }
-  let likedProductList = await userRepository.getLikedProductList(userId);
-  likedProductList = likedProductList.likedProducts.map((product) => {
-    return {
-      ...product,
-      isLiked: true
-    }
-  })
-  return likedProductList
-}
-
-const getArticles = async (userId) => {
-  if (!userId) {
-    const error = new Error('존재하지 않는 유저입니다');
-    error.code = 401;
-    throw error;
-  }
-
-  let articleList = await userRepository.getArticleById(userId);
-  articleList = articleList.createdArticles.map((article) => {
-    const isLiked = article.likedUser.length > 0 ? true : false;
-    const { likedUser, ...rest } = article;
-    return {
-      ...rest,
-      isLiked
-    };
-  })
-
-  return articleList;
-}
-
-const getLikedArticleList = async (userId) => {
-  if (!userId) {
-    const error = new Error('존재하지 않는 유저입니다');
-    error.code = 401;
-    throw error;
-  }
-  let likedArticleList = await userRepository.getLikedArticleList(userId);
-  likedArticleList = likedArticleList.likedArticles.map((article) => {
-    return {
-      ...article,
-      isLiked: true
-    }
-  })
-  return likedArticleList
-}
-
-const filterSensitiveUserDate = (userData) => {
+const filterSensitiveUserData = (userData: User): DisplayUserProfile => {
   const { password, salt, refreshToken, ...unsensitiveData } = userData;
   return unsensitiveData;
 };
 export default {
   createToken,
   refreshToken,
-  createUser,
-  getUser,
-  getUserInfo,
-  updateUserInfo,
-  updateUserPassword,
-  getProducts,
-  getLikedProductList,
-  getArticles,
-  getLikedArticleList,
+  filterSensitiveUserData,
+  checkExistingUser,
 };

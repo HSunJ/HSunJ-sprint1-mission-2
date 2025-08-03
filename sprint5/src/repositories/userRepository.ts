@@ -1,6 +1,7 @@
+import { User } from '@prisma/client';
 import prisma from '../config/prisma.js';
 
-async function findById(id) {
+async function findById(id: string) {
   return prisma.user.findUnique({
     where: {
       id,
@@ -8,26 +9,23 @@ async function findById(id) {
   });
 }
 
-async function findByEmail(email) {
-  return await prisma.User.findUnique({
+async function findByEmail(email: string) {
+  return await prisma.user.findUnique({
     where: {
       email,
     },
   });
 }
 
-async function save(user) {
+async function save(userData: User) {
   return prisma.user.create({
     data: {
-      email: user.email,
-      name: user.name,
-      password: user.password,
-      salt: user.salt,
+      ...userData
     },
   });
 }
 
-async function update(id, data) {
+async function update(id: string, data: Partial<User>) {
   return prisma.user.update({
     where: {
       id,
@@ -36,15 +34,15 @@ async function update(id, data) {
   });
 }
 
-async function createOrUpdate(provider, providerId, email, name) {
-  return prisma.user.upsert({
-    where: { provider, providerId },
-    update: { email, name },
-    create: { provider, providerId, email, name },
-  });
-}
+// async function createOrUpdate(provider, providerId, email, name) {
+//   return prisma.user.upsert({
+//     where: { provider, providerId },
+//     update: { email, name },
+//     create: { provider, providerId, email, name },
+//   });
+// }
 
-async function getProductById(id) {
+async function getProductById(id: string) {
   return await prisma.user.findUnique({
     where: { id },
     select: {
@@ -64,7 +62,7 @@ async function getProductById(id) {
   })
 }
 
-async function getLikedProductList(id) {
+async function getLikedProductList(id: string) {
   return await prisma.user.findUnique({
     where: { id },
     select: {
@@ -80,15 +78,15 @@ async function getLikedProductList(id) {
   });
 }
 
-async function getArticleById(id) {
+async function getArticleById(id: string) {
   return await prisma.user.findUnique({
     where: { id },
     select: {
       createdArticles: {
         select: {
           id: true,
-          name: true,
-          price: true,
+          title: true,
+          content: true,
           createdAt: true,
           likedUser: {
             where: { id },
@@ -100,15 +98,15 @@ async function getArticleById(id) {
   })
 }
 
-async function getLikedArticleList(id) {
+async function getLikedArticleList(id: string) {
   return await prisma.user.findUnique({
     where: { id },
     select: {
       likedArticles: {
         select: {
           id: true,
-          name: true,
-          price: true,
+          title: true,
+          content: true,
           createdAt: true,
         }
       }
@@ -121,7 +119,7 @@ export default {
   findByEmail,
   save,
   update,
-  createOrUpdate,
+  // createOrUpdate,
   getProductById,
   getLikedProductList,
   getArticleById,
