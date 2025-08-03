@@ -1,19 +1,7 @@
-import { Prisma } from "@prisma/client";
+import { RequestHandler } from "express";
 
-export function asyncHandler(handler) {
-  return async function (req, res) {
-    try {
-      await handler(req, res);
-    } catch (e) {
-      if (
-        e instanceof Prisma.PrismaClientKnownRequestError &&
-        e.code === 'P2025'
-      ) {
-        res.sendStatus(404);
-      } else {
-        res.status(500).send({ message: e.message });
-        console.log(e.message);
-      }
-    }
-  };
+export function asyncHandler(handler: RequestHandler): RequestHandler {
+  return (req, res, next) => {
+    Promise.resolve(handler(req, res, next)).catch(next);
+  }
 }
