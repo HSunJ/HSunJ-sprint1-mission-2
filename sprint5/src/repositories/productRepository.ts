@@ -3,93 +3,113 @@ import { Prisma } from "@prisma/client";
 
 import { GetProductListParams, ProductListItem, ProductDetail, ProductCreateInput, DisplayCreateProduct } from "../types/product.d";
 
-async function getById(userId: string | undefined, id: string): Promise<ProductDetail | null> {
-  return await prisma.product.findUnique({
-    select: {
-      id: true,
-      name: true,
-      description: true,
-      price: true,
-      tag: true,
-      likedUser: userId ? {
-        where: { id: userId },
-        select: { id: true }
-      } : false,
-      createdAt: true
-    },
-    where: {
-      id,
-    },
-  });
+class ProductRepository {
+  public async getList(userId: string | undefined,
+    { keyword, order, offset, limit }: GetProductListParams): Promise<ProductListItem[]> {
+    const orderBy: Prisma.ProductOrderByWithRelationInput = order === 'recent' ? { createdAt: 'desc' } : { createdAt: 'asc' };
+    return await prisma.product.findMany({
+      select: {
+        id: true,
+        name: true,
+        price: true,
+        createdAt: true,
+        likedUser: userId ? {
+          where: { id: userId },
+          select: { id: true }
+        } : false
+      },
+      where: keyword ? {
+        OR: [
+          { name: { contains: keyword, mode: 'insensitive' } },
+          { description: { contains: keyword, mode: 'insensitive' } }
+        ]
+      } : undefined,
+      orderBy,
+      skip: offset,
+      take: limit
+    });
+  }
+
+  public async getById(userId: string | undefined, id: string): Promise<ProductDetail> {
+    return await prisma.product.findUniqueOrThrow({
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        price: true,
+        tag: true,
+        createdAt: true,
+        likedUser: userId ? {
+          where: { id: userId },
+          select: { id: true }
+        } : false,
+      },
+      where: {
+        id,
+      },
+    });
+  }
+
+  public async getLiked(userId: string | undefined, id: string): Promise<{ likedUser: { id: string }[] } | null> {
+    return await prisma.product.findUnique({
+      select: {
+        likedUser: { where: { id: userId }, select: { id: true } }
+      },
+      where: { id },
+    });
+  }
+
+  public async createProduct(input: ProductCreateInput, userId: string | undefined): Promise<DisplayCreateProduct> {
+    return await prisma.product.create({
+      data: {
+        ...input,
+        author: { connect: { id: userId } }
+      },
+      select: {
+        id: true,
+        name: true,
+        price: true,
+        createdAt: true
+      }
+    });
+  }
+
+  public async patchProduct(id: string, userId: string | undefined, data: Partial<ProductCreateInput>): Promise<ProductDetail> {
+    return await prisma.product.update({
+      where: {
+        id,
+        userId
+      },
+      data
+    })
+  }
+
+  public async deleteProduct(id: string, userId: string | undefined): Promise<void> {
+    await prisma.product.delete({
+      where: {
+        id,
+        userId
+      }
+    });
+  }
+
+  public async like(id: string, data: { likedUser: { connect: { id: string | undefined } } }): Promise<void> {
+    await prisma.product.update({
+      where: { id },
+      data
+    });
+  }
+
+  public async unlike(id: string, data: { likedUser: { disconnect: { id: string | undefined } } }): Promise<void> {
+    await prisma.product.update({
+      where: { id },
+      data
+    });
+  }
 }
 
-// async function getListById(id: string) {
-//   return await prisma.product.findMany({
-//     where: {
-//       userId: id,
-//     }
-//   });
-// }
 
-async function getList(userId: string | undefined,
-  { keyword, order, offset, limit }: GetProductListParams): Promise<ProductListItem[]> {
-  const orderBy: Prisma.ProductOrderByWithRelationInput = order === 'recent' ? { createdAt: 'desc' } : { createdAt: 'asc' };
-  return await prisma.product.findMany({
-    select: {
-      id: true,
-      name: true,
-      price: true,
-      createdAt: true,
-      likedUser: userId ? {
-        where: { id: userId },
-        select: { id: true }
-      } : false
-    },
-    where: keyword ? {
-      OR: [
-        { name: { contains: keyword, mode: 'insensitive' } },
-        { description: { contains: keyword, mode: 'insensitive' } }
-      ]
-    } : undefined,
-    orderBy,
-    skip: offset,
-    take: limit
-  });
-}
 
-async function createProduct(productInput: ProductCreateInput, userId: string | undefined): Promise<DisplayCreateProduct> {
-  return await prisma.product.create({
-    data: {
-      ...productInput,
-      author: { connect: { id: userId } }
-    },
-    select: {
-      id: true,
-      name: true,
-      price: true,
-      createdAt: true
-    }
-  });
-}
-
-const patchProduct = async (id: string, userId: string | undefined, data: Partial<ProductCreateInput>): Promise<ProductDetail | null> => {
-  return await prisma.product.update({
-    where: {
-      id,
-      userId
-    },
-    data
-  })
-}
-
-const deleteProduct = async (id: string, userId: string | undefined): Promise<void> => {
-  await prisma.product.delete({
-    where: {
-      id,
-      userId
-    }
-  });
-}
 
 const getLikedUser = async (id: string, userId: string | undefined): Promise<{ id: string; }[] | null> => {
   const product = await prisma.product.findUnique({
@@ -118,14 +138,5 @@ const unlikeProduct = async (id: string, userId: string | undefined): Promise<vo
   });
 };
 
-export default {
-  getById,
-  // getListById,
-  getList,
-  createProduct,
-  patchProduct,
-  deleteProduct,
-  getLikedUser,
-  likeProduct,
-  unlikeProduct,
-};
+const productRepository = new ProductRepository();
+export default productRepository;

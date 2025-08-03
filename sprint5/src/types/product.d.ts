@@ -17,26 +17,26 @@ export type ProductListItem = {
 // Product List에서 보여줄 상품 정보
 export type DisplayProductListItem = ProductListItem & Liked;
 
-export type GetProductListParams = {
-  offset?: number;
-  limit?: number;
-  order?: string;
-  keyword?: string;
-};
-
 // Product 상세 조회 타입
 export type ProductDetail = {
   id: string;
   name: string;
-  description: string | null;
+  description?: string | null;
   price: number;
-  tag: $Enums.Tags | null;
+  tag?: $Enums.Tags | null;
   createdAt: Date;
   likedUser?: { id: string }[];
 };
 
 // Product 상세 조회 시 보여줄 상품 정보 타입
 export type DisplayProductDetail = ProductDetail & Liked;
+
+export type GetProductListParams = {
+  offset?: number;
+  limit?: number;
+  order?: string;
+  keyword?: string;
+};
 
 export type ProductCreateInput = {
   name: string;
