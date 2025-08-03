@@ -2,7 +2,6 @@ import { CreateProduct, PatchProduct } from '../structs';
 import { assert } from "superstruct";
 import { RequestHandler } from "express";
 
-import appError from "../utils/appError";
 import productService from "../services/productService";
 
 

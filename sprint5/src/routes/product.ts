@@ -1,18 +1,17 @@
-// import * as dotenv from 'dotenv';
 import express from 'express';
-import { validateProduct } from '../middlewares/validateProduct';
-import { asyncHandler } from '../middlewares/asyncHandler.ts';
-import auth from '../middlewares/auth.js';
 
-import { getProductList, getProduct, createProduct, patchProduct, deleteProduct, likeProduct } from '../controllers/productController.js';
+import { validateProduct } from '../middlewares/validateProduct';
+import auth from '../middlewares/auth';
+import { getProductList, getProduct, createProduct, patchProduct, deleteProduct, likeProduct } from '../controllers/productController';
+import { asyncHandler } from '../middlewares/asyncHandler';
 
 const productRouter = express.Router();
 
 productRouter.route('/')
     .get(auth.verifyAccessTokenOptional,
         asyncHandler(getProductList))
-    .post(validateProduct, 
-        auth.verifyAccessToken, 
+    .post(validateProduct,
+        auth.verifyAccessToken,
         asyncHandler(createProduct));
 
 
@@ -23,7 +22,7 @@ productRouter.route('/:id')
         asyncHandler(patchProduct))
     .delete(auth.verifyAccessToken,
         asyncHandler(deleteProduct))
-    .post(auth.verifyAccessToken, 
-        likeProduct)
+    .post(auth.verifyAccessToken,
+        asyncHandler(likeProduct));
 
 export default productRouter;

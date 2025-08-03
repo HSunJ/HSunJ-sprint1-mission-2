@@ -20,10 +20,6 @@ export const getArticleList: RequestHandler = async (req, res) => {
     limit: Number(limit)
   });
 
-  if (!articleList) {
-    throw new appError.NotFoundError("게시글이 존재하지 않습니다");
-  }
-
   res.status(200).send(articleList);
 };
 
@@ -32,9 +28,6 @@ export const getArticle: RequestHandler = async (req, res) => {
   const userId = req.user?.userId;
 
   const article = await articleService.getArticle(userId, id);
-  if (!article) {
-    throw new appError.NotFoundError("게시글이 존재하지 않습니다");
-  }
 
   res.status(200).send(article);
 };

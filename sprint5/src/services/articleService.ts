@@ -1,8 +1,7 @@
 import articleRepository from "../repositories/articleRepository";
-
 import appError from "../utils/appError";
-
 import { ArticleCreateInput, ArticleItem, DisplayArticleItem, GetArticleListParams } from "../types/article";
+
 class ArticleService {
   public async getArticleList(userId: string | undefined, params: GetArticleListParams): Promise<DisplayArticleItem[]> {
     const articles: ArticleItem[] = await articleRepository.getList(userId, params);

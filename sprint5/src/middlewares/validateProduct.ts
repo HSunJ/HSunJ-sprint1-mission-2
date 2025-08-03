@@ -1,5 +1,5 @@
 import { RequestHandler } from "express";
-import { CreateProduct } from "../structs.js"
+import { CreateProduct } from "../structs"
 import { assert } from 'superstruct';
 
 export const validateProduct: RequestHandler = (req, res, next) => {

@@ -1,31 +1,30 @@
 import express from 'express';
-import { asyncHandler } from '../middlewares/asyncHandler.ts';
 import { getProductComments, createProductComment, patchProductComment, deleteProductComment, getArticleComments, createArticleComment, patchArticleComment, deleteArticleComment } from '../controllers/commentController.js';
 import auth from '../middlewares/auth.js';
 
 const commentRouter = express.Router();
 
 commentRouter.route('/products')
-    .get(asyncHandler(getProductComments))
+    .get(getProductComments)
     .post(auth.verifyAccessToken,
-        asyncHandler(createProductComment));
+        createProductComment);
 
 commentRouter.route('/products/:id')
     .patch(auth.verifyAccessToken,
-        asyncHandler(patchProductComment))
+        patchProductComment)
     .delete(auth.verifyAccessToken,
-        asyncHandler(deleteProductComment));
+        deleteProductComment);
 
     
 commentRouter.route('/articles')
-    .get(asyncHandler(getArticleComments))
+    .get(getArticleComments)
     .post(auth.verifyAccessToken,
-        asyncHandler(createArticleComment));
+        createArticleComment);
 
 commentRouter.route('/articles/:id')
     .patch(auth.verifyAccessToken,
-        asyncHandler(patchArticleComment))
+        patchArticleComment)
     .delete(auth.verifyAccessToken,
-        asyncHandler(deleteArticleComment));
+        deleteArticleComment);
 
 export default commentRouter

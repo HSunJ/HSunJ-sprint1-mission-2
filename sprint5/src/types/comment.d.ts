@@ -7,6 +7,12 @@ export type CommentListItem = {
   createdAt: Date;
 }
 
+export type DisplayCommentList = {
+  data: CommentListItem[];
+  nextCursor: string | null;
+  hasMore: boolean;
+}
+
 export type GetCommentListParams = {
   limit?: number;
   order?: string;
@@ -30,14 +36,8 @@ export type GetCommentListQuery = {
 export type CreateCommentInput = {
   content: string;
   userId: string;
-}
-
-export type CreateProductCommentInput = CreateCommentInput & {
-  productId: string;
-}
-
-export type CreateArticleCommentInput = CreateCommentInput & {
-  articleId: string;
+  productId?: string;
+  articleId?: string;
 }
 
 export type DisplayCreateComment = {
