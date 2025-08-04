@@ -1,4 +1,4 @@
-import prisma from "../config/prisma.js";
+import prisma from "../config/prisma";
 import { Prisma } from "@prisma/client";
 
 import { GetProductListParams, ProductListItem, ProductDetail, ProductCreateInput, DisplayCreateProduct } from "../types/product.d";

@@ -1,9 +1,9 @@
 import jwt from 'jsonwebtoken';
 import { User } from "@prisma/client";
 
-import userRepository from "../repositories/userRepository.js";
+import userRepository from "../repositories/userRepository";
 import appError from "../utils/appError";
-import { DisplayUserProfile } from "../types/user.js";
+import { DisplayUserProfile } from "../types/user";
 
 
 const createToken = async (user: DisplayUserProfile, type: 'access' | 'refresh') => {

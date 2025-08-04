@@ -12,12 +12,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const prisma_js_1 = __importDefault(require("../config/prisma.js"));
+const prisma_1 = __importDefault(require("../config/prisma"));
 class ProductRepository {
     getList(userId_1, _a) {
         return __awaiter(this, arguments, void 0, function* (userId, { keyword, order, offset, limit }) {
             const orderBy = order === 'recent' ? { createdAt: 'desc' } : { createdAt: 'asc' };
-            return yield prisma_js_1.default.product.findMany({
+            return yield prisma_1.default.product.findMany({
                 select: {
                     id: true,
                     name: true,
@@ -42,7 +42,7 @@ class ProductRepository {
     }
     getById(userId, id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield prisma_js_1.default.product.findUniqueOrThrow({
+            return yield prisma_1.default.product.findUniqueOrThrow({
                 select: {
                     id: true,
                     name: true,
@@ -63,7 +63,7 @@ class ProductRepository {
     }
     getLiked(userId, id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield prisma_js_1.default.product.findUnique({
+            return yield prisma_1.default.product.findUnique({
                 select: {
                     likedUser: { where: { id: userId }, select: { id: true } }
                 },
@@ -73,7 +73,7 @@ class ProductRepository {
     }
     createProduct(input, userId) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield prisma_js_1.default.product.create({
+            return yield prisma_1.default.product.create({
                 data: Object.assign(Object.assign({}, input), { author: { connect: { id: userId } } }),
                 select: {
                     id: true,
@@ -86,7 +86,7 @@ class ProductRepository {
     }
     patchProduct(id, userId, data) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield prisma_js_1.default.product.update({
+            return yield prisma_1.default.product.update({
                 where: {
                     id,
                     userId
@@ -97,7 +97,7 @@ class ProductRepository {
     }
     deleteProduct(id, userId) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield prisma_js_1.default.product.delete({
+            yield prisma_1.default.product.delete({
                 where: {
                     id,
                     userId
@@ -107,7 +107,7 @@ class ProductRepository {
     }
     like(id, data) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield prisma_js_1.default.product.update({
+            yield prisma_1.default.product.update({
                 where: { id },
                 data
             });
@@ -115,7 +115,7 @@ class ProductRepository {
     }
     unlike(id, data) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield prisma_js_1.default.product.update({
+            yield prisma_1.default.product.update({
                 where: { id },
                 data
             });
@@ -123,7 +123,7 @@ class ProductRepository {
     }
 }
 const getLikedUser = (id, userId) => __awaiter(void 0, void 0, void 0, function* () {
-    const product = yield prisma_js_1.default.product.findUnique({
+    const product = yield prisma_1.default.product.findUnique({
         where: { id },
         select: {
             likedUser: {
@@ -135,13 +135,13 @@ const getLikedUser = (id, userId) => __awaiter(void 0, void 0, void 0, function*
     return product ? product.likedUser : null;
 });
 const likeProduct = (id, userId) => __awaiter(void 0, void 0, void 0, function* () {
-    yield prisma_js_1.default.product.update({
+    yield prisma_1.default.product.update({
         where: { id },
         data: { likedUser: { connect: { id: userId } } }
     });
 });
 const unlikeProduct = (id, userId) => __awaiter(void 0, void 0, void 0, function* () {
-    yield prisma_js_1.default.product.update({
+    yield prisma_1.default.product.update({
         where: { id },
         data: { likedUser: { disconnect: { id: userId } } }
     });

@@ -8,7 +8,7 @@ import { createUser,
   updateUserPassword, 
   getUserProducts, 
   getLikedProducts } from "../controllers/userController";
-import auth from "../middlewares/auth.js";
+import auth from "../middlewares/auth";
 import { asyncHandler } from "../middlewares/asyncHandler";
 
 const userRouter = express.Router();

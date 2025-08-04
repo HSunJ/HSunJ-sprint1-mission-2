@@ -12,10 +12,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const prisma_js_1 = __importDefault(require("../config/prisma.js"));
+const prisma_1 = __importDefault(require("../config/prisma"));
 function findById(id) {
     return __awaiter(this, void 0, void 0, function* () {
-        return prisma_js_1.default.user.findUnique({
+        return prisma_1.default.user.findUnique({
             where: {
                 id,
             },
@@ -24,7 +24,7 @@ function findById(id) {
 }
 function findByEmail(email) {
     return __awaiter(this, void 0, void 0, function* () {
-        return yield prisma_js_1.default.user.findUnique({
+        return yield prisma_1.default.user.findUnique({
             where: {
                 email,
             },
@@ -33,14 +33,14 @@ function findByEmail(email) {
 }
 function save(userData) {
     return __awaiter(this, void 0, void 0, function* () {
-        return prisma_js_1.default.user.create({
+        return prisma_1.default.user.create({
             data: Object.assign({}, userData),
         });
     });
 }
 function update(id, data) {
     return __awaiter(this, void 0, void 0, function* () {
-        return prisma_js_1.default.user.update({
+        return prisma_1.default.user.update({
             where: {
                 id,
             },
@@ -57,7 +57,7 @@ function update(id, data) {
 // }
 function getProductById(id) {
     return __awaiter(this, void 0, void 0, function* () {
-        return yield prisma_js_1.default.user.findUnique({
+        return yield prisma_1.default.user.findUnique({
             where: { id },
             select: {
                 createdProducts: {
@@ -78,7 +78,7 @@ function getProductById(id) {
 }
 function getLikedProductList(id) {
     return __awaiter(this, void 0, void 0, function* () {
-        return yield prisma_js_1.default.user.findUnique({
+        return yield prisma_1.default.user.findUnique({
             where: { id },
             select: {
                 likedProducts: {
@@ -95,7 +95,7 @@ function getLikedProductList(id) {
 }
 function getArticleById(id) {
     return __awaiter(this, void 0, void 0, function* () {
-        return yield prisma_js_1.default.user.findUnique({
+        return yield prisma_1.default.user.findUnique({
             where: { id },
             select: {
                 createdArticles: {
@@ -116,7 +116,7 @@ function getArticleById(id) {
 }
 function getLikedArticleList(id) {
     return __awaiter(this, void 0, void 0, function* () {
-        return yield prisma_js_1.default.user.findUnique({
+        return yield prisma_1.default.user.findUnique({
             where: { id },
             select: {
                 likedArticles: {

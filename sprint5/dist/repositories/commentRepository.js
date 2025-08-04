@@ -12,19 +12,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const prisma_js_1 = __importDefault(require("../config/prisma.js"));
+const prisma_1 = __importDefault(require("../config/prisma"));
 class CommentRepository {
     getList(query, type) {
         return __awaiter(this, void 0, void 0, function* () {
             return type === 'product' ?
-                yield prisma_js_1.default.productComment.findMany(query) :
-                yield prisma_js_1.default.articleComment.findMany(query);
+                yield prisma_1.default.productComment.findMany(query) :
+                yield prisma_1.default.articleComment.findMany(query);
         });
     }
     saveComment(input, userId, type) {
         return __awaiter(this, void 0, void 0, function* () {
             const createdComment = type === 'product' ?
-                yield prisma_js_1.default.productComment.create({
+                yield prisma_1.default.productComment.create({
                     data: {
                         content: input.content,
                         user: {
@@ -41,7 +41,7 @@ class CommentRepository {
                         userId: true,
                     },
                 }) :
-                yield prisma_js_1.default.articleComment.create({
+                yield prisma_1.default.articleComment.create({
                     data: {
                         content: input.content,
                         user: {
@@ -65,7 +65,7 @@ class CommentRepository {
     updateComment(id, userId, input, type) {
         return __awaiter(this, void 0, void 0, function* () {
             const updatedComment = type === 'product' ?
-                yield prisma_js_1.default.productComment.update({
+                yield prisma_1.default.productComment.update({
                     where: { id, userId },
                     data: input,
                     select: {
@@ -75,7 +75,7 @@ class CommentRepository {
                         userId: true,
                     },
                 }) :
-                yield prisma_js_1.default.articleComment.update({
+                yield prisma_1.default.articleComment.update({
                     where: { id, userId },
                     data: input,
                     select: {
@@ -92,8 +92,8 @@ class CommentRepository {
     deleteById(id, userId, type) {
         return __awaiter(this, void 0, void 0, function* () {
             const deletedComment = type === 'product' ?
-                yield prisma_js_1.default.productComment.delete({ where: { id, userId } }) :
-                yield prisma_js_1.default.articleComment.delete({ where: { id, userId } });
+                yield prisma_1.default.productComment.delete({ where: { id, userId } }) :
+                yield prisma_1.default.articleComment.delete({ where: { id, userId } });
             return deletedComment;
         });
     }
@@ -102,8 +102,8 @@ class CommentRepository {
 function deleteById(id, userId, type) {
     return __awaiter(this, void 0, void 0, function* () {
         const deletedComment = type === 'product' ?
-            yield prisma_js_1.default.productComment.delete({ where: { id, userId } }) :
-            yield prisma_js_1.default.articleComment.delete({ where: { id, userId } });
+            yield prisma_1.default.productComment.delete({ where: { id, userId } }) :
+            yield prisma_1.default.articleComment.delete({ where: { id, userId } });
         return deletedComment;
     });
 }

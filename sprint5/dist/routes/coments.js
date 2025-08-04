@@ -4,19 +4,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const commentController_js_1 = require("../controllers/commentController.js");
-const auth_js_1 = __importDefault(require("../middlewares/auth.js"));
+const commentController_1 = require("../controllers/commentController");
+const auth_1 = __importDefault(require("../middlewares/auth"));
 const commentRouter = express_1.default.Router();
 commentRouter.route('/products')
-    .get(commentController_js_1.getProductComments)
-    .post(auth_js_1.default.verifyAccessToken, commentController_js_1.createProductComment);
+    .get(commentController_1.getProductComments)
+    .post(auth_1.default.verifyAccessToken, commentController_1.createProductComment);
 commentRouter.route('/products/:id')
-    .patch(auth_js_1.default.verifyAccessToken, commentController_js_1.patchProductComment)
-    .delete(auth_js_1.default.verifyAccessToken, commentController_js_1.deleteProductComment);
+    .patch(auth_1.default.verifyAccessToken, commentController_1.patchProductComment)
+    .delete(auth_1.default.verifyAccessToken, commentController_1.deleteProductComment);
 commentRouter.route('/articles')
-    .get(commentController_js_1.getArticleComments)
-    .post(auth_js_1.default.verifyAccessToken, commentController_js_1.createArticleComment);
+    .get(commentController_1.getArticleComments)
+    .post(auth_1.default.verifyAccessToken, commentController_1.createArticleComment);
 commentRouter.route('/articles/:id')
-    .patch(auth_js_1.default.verifyAccessToken, commentController_js_1.patchArticleComment)
-    .delete(auth_js_1.default.verifyAccessToken, commentController_js_1.deleteArticleComment);
+    .patch(auth_1.default.verifyAccessToken, commentController_1.patchArticleComment)
+    .delete(auth_1.default.verifyAccessToken, commentController_1.deleteArticleComment);
 exports.default = commentRouter;

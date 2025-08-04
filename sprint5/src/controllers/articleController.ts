@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { PatchArticle } from '../structs.js';
+import { PatchArticle } from '../structs';
 import { assert } from "superstruct";
 import { RequestHandler } from "express";
 

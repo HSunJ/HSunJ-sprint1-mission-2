@@ -1,11 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.validateProduct = void 0;
-const structs_js_1 = require("../structs.js");
+const structs_1 = require("../structs");
 const superstruct_1 = require("superstruct");
 const validateProduct = (req, res, next) => {
     try {
-        (0, superstruct_1.assert)(req.body, structs_js_1.CreateProduct);
+        (0, superstruct_1.assert)(req.body, structs_1.CreateProduct);
         next();
     }
     catch (e) {

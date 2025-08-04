@@ -1,6 +1,6 @@
 import express from 'express';
-import { getProductComments, createProductComment, patchProductComment, deleteProductComment, getArticleComments, createArticleComment, patchArticleComment, deleteArticleComment } from '../controllers/commentController.js';
-import auth from '../middlewares/auth.js';
+import { getProductComments, createProductComment, patchProductComment, deleteProductComment, getArticleComments, createArticleComment, patchArticleComment, deleteArticleComment } from '../controllers/commentController';
+import auth from '../middlewares/auth';
 
 const commentRouter = express.Router();
 

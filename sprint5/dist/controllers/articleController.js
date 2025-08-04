@@ -14,7 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.likeArticle = exports.deleteArticle = exports.patchArticle = exports.createArticle = exports.getArticle = exports.getArticleList = void 0;
 const client_1 = require("@prisma/client");
-const structs_js_1 = require("../structs.js");
+const structs_1 = require("../structs");
 const superstruct_1 = require("superstruct");
 const articleRepository_1 = __importDefault(require("../repositories/articleRepository"));
 const articleService_1 = __importDefault(require("../services/articleService"));
@@ -49,7 +49,7 @@ const createArticle = (req, res) => __awaiter(void 0, void 0, void 0, function* 
 exports.createArticle = createArticle;
 const patchArticle = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
-    (0, superstruct_1.assert)(req.body, structs_js_1.PatchArticle);
+    (0, superstruct_1.assert)(req.body, structs_1.PatchArticle);
     const { id } = req.params;
     const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.userId;
     const article = yield articleRepository_1.default.patchArticle(userId, id, req.body);

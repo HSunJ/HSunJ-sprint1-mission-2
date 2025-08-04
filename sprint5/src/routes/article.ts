@@ -2,8 +2,8 @@
 import express from 'express';
 
 import { validateArticle } from '../middlewares/validateArticle';
-import { getArticleList, getArticle, createArticle, patchArticle, deleteArticle } from '../controllers/articleController.js';
-import auth from '../middlewares/auth.js';
+import { getArticleList, getArticle, createArticle, patchArticle, deleteArticle } from '../controllers/articleController';
+import auth from '../middlewares/auth';
 import { asyncHandler } from '../middlewares/asyncHandler';
 
 const articleRouter = express.Router();
