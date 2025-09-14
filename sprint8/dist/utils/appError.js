@@ -27,10 +27,16 @@ class ConflictError extends AppError {
         super(message, 409);
     }
 }
+class AuthorizationError extends AppError {
+    constructor(message = "Forbidden") {
+        super(message, 403);
+    }
+}
 exports.default = {
     AppError,
     NotFoundError,
     BadRequestError,
     UnauthorizedError,
-    ConflictError
+    ConflictError,
+    AuthorizationError
 };

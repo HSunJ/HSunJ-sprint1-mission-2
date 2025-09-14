@@ -38,11 +38,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv = __importStar(require("dotenv"));
 const express_1 = __importDefault(require("express"));
+const http_1 = require("http");
+const socket_io_1 = require("socket.io");
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const path_1 = __importDefault(require("path"));
 const cors_1 = __importDefault(require("cors"));
 const client_1 = require("@prisma/client");
 const appError_1 = __importDefault(require("./utils/appError"));
+const socketAuth_1 = require("./middlewares/socketAuth");
 const product_1 = __importDefault(require("./routes/product"));
 const article_1 = __importDefault(require("./routes/article"));
 const upload_1 = __importDefault(require("./routes/upload"));
@@ -50,6 +53,15 @@ const coments_1 = __importDefault(require("./routes/coments"));
 const users_1 = __importDefault(require("./routes/users"));
 dotenv.config();
 const app = (0, express_1.default)();
+const httpServer = (0, http_1.createServer)(app);
+const io = new socket_io_1.Server(httpServer, {
+    cors: {
+        origin: '*',
+        methods: ['GET', 'POST'],
+        credentials: true
+    }
+});
+io.use(socketAuth_1.verifySocketToken);
 app.use(express_1.default.json());
 app.use((0, cors_1.default)());
 app.use((0, cookie_parser_1.default)());
@@ -75,4 +87,4 @@ app.use('/', (err, req, res, next) => {
     res.status(500).json({ message: err.message });
     console.log(err.message);
 });
-app.listen(process.env.PORT || 3000, () => console.log('Server Started'));
+httpServer.listen(process.env.PORT || 3000, () => console.log('Server Started'));

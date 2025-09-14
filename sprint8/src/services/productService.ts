@@ -1,3 +1,4 @@
+import prisma from "../config/prisma";
 import productRepository from "../repositories/productRepository";
 import {
   ProductListItem,
@@ -9,12 +10,16 @@ import {
   ProductCreateInput
 } from "../types/product";
 import appError from "../utils/appError";
+import { io } from "../socket";
+import { connectedUsers } from "../socket/handler/connectionHandler";
+import { joinRoom, leaveRoom } from "../utils/roomUtils";
+import notificationService from "./notificationServices";
 
 class ProductService {
-  public async getProductList(userId: string | undefined, params: GetProductListParams): Promise<DisplayProductListItem[]> {
-    const products: ProductListItem[] = await productRepository.getList(userId, params);
+  public async getProductList(userId: string, params: GetProductListParams) {
+    const products = await productRepository.getList(userId, params);
 
-    const displayProductList: DisplayProductListItem[] = products.map((product) => {
+    const displayProductList = products.map((product) => {
       const isLiked = product.likedUser ? product.likedUser.length > 0 : false;
       return {
         id: product.id,
@@ -27,11 +32,11 @@ class ProductService {
     return displayProductList;
   }
 
-  public async getProduct(userId: string | undefined, id: string): Promise<ProductDetail> {
-    const product: ProductDetail = await productRepository.getById(userId, id);
+  public async getProduct(userId: string, id: string) {
+    const product = await productRepository.getById(userId, id);
 
     const isLiked = product.likedUser ? product.likedUser.length > 0 : false;
-    const displayProduct: DisplayProductDetail = {
+    const displayProduct = {
       id: product.id,
       name: product.name,
       price: product.price,
@@ -41,8 +46,8 @@ class ProductService {
     return displayProduct;
   }
 
-  public async createProduct(input: ProductCreateInput, userId: string | undefined): Promise<DisplayCreateProduct> {
-    const product: DisplayCreateProduct = await productRepository.createProduct(input, userId);
+  public async createProduct(input: ProductCreateInput, userId: string) {
+    const product = await productRepository.createProduct(input, userId);
 
     const displayProduct = {
       ...product,
@@ -51,30 +56,45 @@ class ProductService {
     return displayProduct;
   }
 
-  public async patchProduct(userId: string | undefined, id: string, input: Partial<ProductCreateInput>): Promise<DisplayProductDetail> {
-    const product: ProductDetail = await productRepository.patchProduct(id, userId, input);
-    if (!product) {
-      throw new appError.NotFoundError("상품이 존재하지 않습니다");
-    }
+  public async patchProduct(userId: string, id: string, input: Partial<ProductCreateInput>) {
+    await prisma.$transaction(async (tx) => {
+      const oldProduct = await productRepository.getById(userId, id, tx, { price: true }) as unknown as { price: number };
+      const product = await productRepository.patchProduct(id, userId, input, tx);
+      if (!product) {
+        throw new appError.NotFoundError("상품이 존재하지 않습니다");
+      }
 
-    const isLiked = product.likedUser ? product.likedUser.length > 0 : false;
-    const displayProduct = {
-      id: product.id,
-      name: product.name,
-      description: product.description,
-      price: product.price,
-      tag: product.tag,
-      createdAt: product.createdAt,
-      isLiked
-    }
-    return displayProduct;
+      if (oldProduct.price !== product.price) {
+        // 가격이 변경된 경우에 대한 처리
+        const likedUsers = product.likedUser.map(user => user.id);
+        const productData = {
+          id,
+          name: product.name,
+          oldprice: oldProduct.price,
+          newprice: product.price,
+          likedUsers
+        }
+        const notifications = notificationService.createPriceChangeNotifications(productData);
+      }
+      const isLiked = product.likedUser.filter(user => user.id === userId)
+      const displayProduct = {
+        id: product.id,
+        name: product.name,
+        description: product.description,
+        price: product.price,
+        tag: product.tag,
+        createdAt: product.createdAt,
+        isLiked: isLiked.length > 0
+      }
+      return displayProduct;
+    })
   }
 
-  public async deleteProduct(userId: string | undefined, id: string): Promise<void>{
+  public async deleteProduct(userId: string, id: string) {
     await productRepository.deleteProduct(id, userId);
   }
 
-  public async isLiked(userId: string | undefined, id: string): Promise<boolean> {
+  public async isLiked(userId: string, id: string) {
     const product = await productRepository.getById(userId, id);
     if (!product) {
       throw new appError.NotFoundError("게시글이 존재하지 않습니다");
@@ -82,20 +102,28 @@ class ProductService {
     return product.likedUser ? product.likedUser.length > 0 : false;
   }
 
-  public async likeProduct(userId: string | undefined, id: string): Promise<void> {
+  public async likeProduct(userId: string, id: string) {
     await productRepository.like(id, {
       likedUser: {
         connect: { id: userId }
       }
     });
+
+    // 유저를 상품 ID룸에 추가
+    const userSockets = connectedUsers.get(userId);
+    if (userSockets) joinRoom(`product:${id}`, io, userSockets);
   }
 
-  public async unlikeProduct(userId: string | undefined, id: string): Promise<void> {
+  public async unlikeProduct(userId: string, id: string) {
     await productRepository.unlike(id, {
       likedUser: {
         disconnect: { id: userId }
       }
     });
+
+    // 유저를 상품 ID룸에서 제거
+    const userSockets = connectedUsers.get(userId!);
+    if (userSockets) leaveRoom(`product:${id}`, io, userSockets);
   }
 }
 

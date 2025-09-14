@@ -1,17 +1,22 @@
 import * as dotenv from 'dotenv';
 import express, { Request, Response, NextFunction, Errback, ErrorRequestHandler } from 'express';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
 import cookieParser from 'cookie-parser';
 import path from 'path';
 import cors from 'cors';
 import { Prisma } from '@prisma/client';
 
 import appError from './utils/appError';
+import { initializeSocket } from './socket/index';
+import { verifySocketToken } from './middlewares/socketAuth';
 
 import productRouter from './routes/product';
 import articleRouter from './routes/article';
 import uploadRouter from './routes/upload';
 import commentRouter from './routes/coments';
 import userRouter from './routes/users';
+import notificationRouter from './routes/notificationRoute';
 import { fileURLToPath } from 'url';
 import { StructError } from 'superstruct';
 
@@ -19,6 +24,8 @@ import { StructError } from 'superstruct';
 dotenv.config();
 
 const app = express();
+const { io, httpServer } = initializeSocket(app);
+
 app.use(express.json());
 app.use(cors());
 app.use(cookieParser());
@@ -33,6 +40,7 @@ app.use('/articles', articleRouter);
 app.use('/comments', commentRouter)
 app.use('/files', uploadRouter);
 app.use('/users', userRouter);
+app.use('/notifications', notificationRouter);
 
 
 app.use('/', (err: Error, req: Request, res: Response, next: NextFunction) => {
@@ -50,4 +58,4 @@ app.use('/', (err: Error, req: Request, res: Response, next: NextFunction) => {
   console.log(err.message);
 })
 
-app.listen(process.env.PORT || 3000, () => console.log('Server Started'));
+httpServer.listen(process.env.PORT || 3000, () => console.log('Server Started'));

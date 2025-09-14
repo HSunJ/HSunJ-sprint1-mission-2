@@ -3,11 +3,13 @@ import { assert } from "superstruct";
 import { RequestHandler } from "express";
 
 import productService from "../services/productService";
+import appError from '../utils/appError';
 
 
 export const getProductList: RequestHandler = async (req, res) => {
   const { offset = 0, limit = 10, order = "recent", keyword = "" } = req.query;
   const userId = req.user?.userId;
+  if (!userId) throw new appError.UnauthorizedError("로그인이 필요합니다");
 
   const products = await productService.getProductList(userId, {
     keyword: keyword as string,
@@ -22,6 +24,7 @@ export const getProductList: RequestHandler = async (req, res) => {
 export const getProduct: RequestHandler = async (req, res) => {
   const { id } = req.params;
   const userId = req.user?.userId;
+  if (!userId) throw new appError.UnauthorizedError("로그인이 필요합니다");
 
   const product = await productService.getProduct(userId, id);
 
@@ -31,6 +34,7 @@ export const getProduct: RequestHandler = async (req, res) => {
 export const createProduct: RequestHandler = async (req, res) => {
   assert(req.body, CreateProduct);
   const userId = req.user?.userId;
+  if (!userId) throw new appError.UnauthorizedError("로그인이 필요합니다");
 
   const product = await productService.createProduct(req.body, userId);
   res.status(201).send(product);
@@ -40,6 +44,7 @@ export const patchProduct: RequestHandler = async (req, res) => {
   assert(req.body, PatchProduct);
   const { id } = req.params;
   const userId = req.user?.userId;
+  if (!userId) throw new appError.UnauthorizedError("로그인이 필요합니다");
 
   const product = await productService.patchProduct(userId, id, req.body);
   res.status(202).send(product);
@@ -48,6 +53,7 @@ export const patchProduct: RequestHandler = async (req, res) => {
 export const deleteProduct: RequestHandler = async (req, res) => {
   const { id } = req.params;  
   const userId = req.user?.userId;
+  if (!userId) throw new appError.UnauthorizedError("로그인이 필요합니다");
 
   await productService.deleteProduct(userId, id);
   res.status(204).send({ message: "게시글이 삭제되었습니다" });
@@ -55,6 +61,7 @@ export const deleteProduct: RequestHandler = async (req, res) => {
 
 export const likeProduct: RequestHandler = async (req, res) => {
   const userId = req.user?.userId;
+  if (!userId) throw new appError.UnauthorizedError("로그인이 필요합니다");
   const id = req.params.id;
 
   if (await productService.isLiked(userId, id)) {

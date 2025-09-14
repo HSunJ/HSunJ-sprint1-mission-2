@@ -12,7 +12,7 @@ const verifyAccessTokenOptional = expressjwt({
   algorithms: ['HS256'],
   requestProperty: 'user',
   credentialsRequired: false
-});
+}); 
 
 const verifyRefreshToken = expressjwt({
   secret: process.env.JWT_SECRET as string,

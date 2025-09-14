@@ -12,8 +12,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const prisma_1 = __importDefault(require("../config/prisma"));
 const productRepository_1 = __importDefault(require("../repositories/productRepository"));
 const appError_1 = __importDefault(require("../utils/appError"));
+const socket_1 = require("../socket");
+const connectionHandler_1 = require("../socket/handler/connectionHandler");
+const roomUtils_1 = require("../utils/roomUtils");
 class ProductService {
     getProductList(userId, params) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -54,21 +58,41 @@ class ProductService {
     }
     patchProduct(userId, id, input) {
         return __awaiter(this, void 0, void 0, function* () {
-            const product = yield productRepository_1.default.patchProduct(id, userId, input);
-            if (!product) {
-                throw new appError_1.default.NotFoundError("상품이 존재하지 않습니다");
-            }
-            const isLiked = product.likedUser ? product.likedUser.length > 0 : false;
-            const displayProduct = {
-                id: product.id,
-                name: product.name,
-                description: product.description,
-                price: product.price,
-                tag: product.tag,
-                createdAt: product.createdAt,
-                isLiked
-            };
-            return displayProduct;
+            yield prisma_1.default.$transaction((tx) => __awaiter(this, void 0, void 0, function* () {
+                const oldProduct = yield productRepository_1.default.getById(userId, id, tx, { price: true });
+                const product = yield productRepository_1.default.patchProduct(id, userId, input, tx);
+                if (!product) {
+                    throw new appError_1.default.NotFoundError("상품이 존재하지 않습니다");
+                }
+                if (oldProduct.price !== product.price) {
+                    // 가격이 변경된 경우에 대한 처리
+                    const likedUsers = product.likedUser.map(user => user.id);
+                    const productData = {
+                        id,
+                        name: product.name,
+                        oldprice: oldProduct.price,
+                        newprice: product.price,
+                        likedUsers
+                    };
+                    const priceChangeNotifications = likedUsers.map(targetId => ({
+                        userId: targetId,
+                        type: 'PRODUCT_PRICE_CHANGE',
+                        content: `${product.name}의 가격이 변경되었습니다: ${oldProduct.price} -> ${product.price}`,
+                        relatedId: id,
+                    }));
+                }
+                const isLiked = product.likedUser.filter(user => user.id === userId);
+                const displayProduct = {
+                    id: product.id,
+                    name: product.name,
+                    description: product.description,
+                    price: product.price,
+                    tag: product.tag,
+                    createdAt: product.createdAt,
+                    isLiked: isLiked.length > 0
+                };
+                return displayProduct;
+            }));
         });
     }
     deleteProduct(userId, id) {
@@ -92,6 +116,11 @@ class ProductService {
                     connect: { id: userId }
                 }
             });
+            // 유저를 상품 ID룸에 추가
+            const io = (0, socket_1.getSocketIo)();
+            const userSockets = connectionHandler_1.connectedUsers.get(userId);
+            if (userSockets)
+                (0, roomUtils_1.joinRoom)(`product:${id}`, io, userSockets);
         });
     }
     unlikeProduct(userId, id) {
@@ -101,6 +130,11 @@ class ProductService {
                     disconnect: { id: userId }
                 }
             });
+            // 유저를 상품 ID룸에서 제거
+            const io = (0, socket_1.getSocketIo)();
+            const userSockets = connectionHandler_1.connectedUsers.get(userId);
+            if (userSockets)
+                (0, roomUtils_1.leaveRoom)(`product:${id}`, io, userSockets);
         });
     }
 }

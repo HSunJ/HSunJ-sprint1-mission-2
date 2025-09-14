@@ -40,21 +40,22 @@ class ProductRepository {
             });
         });
     }
-    getById(userId, id) {
+    getById(userId, id, tx, select) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield prisma_1.default.product.findUniqueOrThrow({
-                select: {
-                    id: true,
-                    name: true,
-                    description: true,
-                    price: true,
-                    tag: true,
-                    createdAt: true,
-                    likedUser: userId ? {
-                        where: { id: userId },
-                        select: { id: true }
-                    } : false,
-                },
+            const defaultSelect = {
+                id: true,
+                name: true,
+                description: true,
+                price: true,
+                tag: true,
+                createdAt: true,
+                likedUser: userId ? {
+                    where: { id: userId },
+                    select: { id: true }
+                } : false,
+            };
+            return yield (tx || prisma_1.default).product.findUniqueOrThrow({
+                select: select || defaultSelect,
                 where: {
                     id,
                 },
@@ -84,14 +85,23 @@ class ProductRepository {
             });
         });
     }
-    patchProduct(id, userId, data) {
+    patchProduct(id, userId, data, tx) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield prisma_1.default.product.update({
+            return yield (tx || prisma_1.default).product.update({
                 where: {
                     id,
                     userId
                 },
-                data
+                data,
+                select: {
+                    id: true,
+                    name: true,
+                    description: true,
+                    price: true,
+                    tag: true,
+                    createdAt: true,
+                    likedUser: { select: { id: true } }
+                }
             });
         });
     }
@@ -133,18 +143,6 @@ const getLikedUser = (id, userId) => __awaiter(void 0, void 0, void 0, function*
         }
     });
     return product ? product.likedUser : null;
-});
-const likeProduct = (id, userId) => __awaiter(void 0, void 0, void 0, function* () {
-    yield prisma_1.default.product.update({
-        where: { id },
-        data: { likedUser: { connect: { id: userId } } }
-    });
-});
-const unlikeProduct = (id, userId) => __awaiter(void 0, void 0, void 0, function* () {
-    yield prisma_1.default.product.update({
-        where: { id },
-        data: { likedUser: { disconnect: { id: userId } } }
-    });
 });
 const productRepository = new ProductRepository();
 exports.default = productRepository;

@@ -16,10 +16,13 @@ exports.likeProduct = exports.deleteProduct = exports.patchProduct = exports.cre
 const structs_1 = require("../structs");
 const superstruct_1 = require("superstruct");
 const productService_1 = __importDefault(require("../services/productService"));
+const appError_1 = __importDefault(require("../utils/appError"));
 const getProductList = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const { offset = 0, limit = 10, order = "recent", keyword = "" } = req.query;
     const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.userId;
+    if (!userId)
+        throw new appError_1.default.UnauthorizedError("로그인이 필요합니다");
     const products = yield productService_1.default.getProductList(userId, {
         keyword: keyword,
         order: order,
@@ -33,6 +36,8 @@ const getProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     var _a;
     const { id } = req.params;
     const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.userId;
+    if (!userId)
+        throw new appError_1.default.UnauthorizedError("로그인이 필요합니다");
     const product = yield productService_1.default.getProduct(userId, id);
     res.status(200).send(product);
 });
@@ -41,6 +46,8 @@ const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     var _a;
     (0, superstruct_1.assert)(req.body, structs_1.CreateProduct);
     const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.userId;
+    if (!userId)
+        throw new appError_1.default.UnauthorizedError("로그인이 필요합니다");
     const product = yield productService_1.default.createProduct(req.body, userId);
     res.status(201).send(product);
 });
@@ -50,6 +57,8 @@ const patchProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     (0, superstruct_1.assert)(req.body, structs_1.PatchProduct);
     const { id } = req.params;
     const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.userId;
+    if (!userId)
+        throw new appError_1.default.UnauthorizedError("로그인이 필요합니다");
     const product = yield productService_1.default.patchProduct(userId, id, req.body);
     res.status(202).send(product);
 });
@@ -58,6 +67,8 @@ const deleteProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     var _a;
     const { id } = req.params;
     const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.userId;
+    if (!userId)
+        throw new appError_1.default.UnauthorizedError("로그인이 필요합니다");
     yield productService_1.default.deleteProduct(userId, id);
     res.status(204).send({ message: "게시글이 삭제되었습니다" });
 });
@@ -65,6 +76,8 @@ exports.deleteProduct = deleteProduct;
 const likeProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.userId;
+    if (!userId)
+        throw new appError_1.default.UnauthorizedError("로그인이 필요합니다");
     const id = req.params.id;
     if (yield productService_1.default.isLiked(userId, id)) {
         yield productService_1.default.unlikeProduct(userId, id);

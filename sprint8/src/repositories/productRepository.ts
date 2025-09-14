@@ -4,8 +4,8 @@ import { Prisma } from "@prisma/client";
 import { GetProductListParams, ProductListItem, ProductDetail, ProductCreateInput, DisplayCreateProduct } from "../types/product.d";
 
 class ProductRepository {
-  public async getList(userId: string | undefined,
-    { keyword, order, offset, limit }: GetProductListParams): Promise<ProductListItem[]> {
+  public async getList(userId: string,
+    { keyword, order, offset, limit }: GetProductListParams) {
     const orderBy: Prisma.ProductOrderByWithRelationInput = order === 'recent' ? { createdAt: 'desc' } : { createdAt: 'asc' };
     return await prisma.product.findMany({
       select: {
@@ -30,27 +30,28 @@ class ProductRepository {
     });
   }
 
-  public async getById(userId: string | undefined, id: string): Promise<ProductDetail> {
-    return await prisma.product.findUniqueOrThrow({
-      select: {
-        id: true,
-        name: true,
-        description: true,
-        price: true,
-        tag: true,
-        createdAt: true,
-        likedUser: userId ? {
-          where: { id: userId },
-          select: { id: true }
-        } : false,
-      },
+  public async getById(userId: string, id: string, tx?: Prisma.TransactionClient, select?: any) {
+    const defaultSelect = {
+      id: true,
+      name: true,
+      description: true,
+      price: true,
+      tag: true,
+      createdAt: true,
+      likedUser: userId ? {
+        where: { id: userId },
+        select: { id: true }
+      } : false,
+    }
+    return await (tx || prisma).product.findUniqueOrThrow({
+      select: select || defaultSelect,
       where: {
         id,
       },
     });
   }
 
-  public async getLiked(userId: string | undefined, id: string): Promise<{ likedUser: { id: string }[] } | null> {
+  public async getLiked(userId: string, id: string) {
     return await prisma.product.findUnique({
       select: {
         likedUser: { where: { id: userId }, select: { id: true } }
@@ -59,7 +60,7 @@ class ProductRepository {
     });
   }
 
-  public async createProduct(input: ProductCreateInput, userId: string | undefined): Promise<DisplayCreateProduct> {
+  public async createProduct(input: ProductCreateInput, userId: string) {
     return await prisma.product.create({
       data: {
         ...input,
@@ -74,17 +75,26 @@ class ProductRepository {
     });
   }
 
-  public async patchProduct(id: string, userId: string | undefined, data: Partial<ProductCreateInput>): Promise<ProductDetail> {
-    return await prisma.product.update({
+  public async patchProduct(id: string, userId: string, data: Partial<ProductCreateInput>, tx?: Prisma.TransactionClient) {
+    return await (tx || prisma).product.update({
       where: {
         id,
         userId
       },
-      data
+      data,
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        price: true,
+        tag: true,
+        createdAt: true,
+        likedUser: { select: { id: true } }
+      }
     })
   }
 
-  public async deleteProduct(id: string, userId: string | undefined): Promise<void> {
+  public async deleteProduct(id: string, userId: string) {
     await prisma.product.delete({
       where: {
         id,
@@ -93,14 +103,14 @@ class ProductRepository {
     });
   }
 
-  public async like(id: string, data: { likedUser: { connect: { id: string | undefined } } }): Promise<void> {
+  public async like(id: string, data: { likedUser: { connect: { id: string } } }) {
     await prisma.product.update({
       where: { id },
       data
     });
   }
 
-  public async unlike(id: string, data: { likedUser: { disconnect: { id: string | undefined } } }): Promise<void> {
+  public async unlike(id: string, data: { likedUser: { disconnect: { id: string } } }) {
     await prisma.product.update({
       where: { id },
       data
@@ -108,10 +118,7 @@ class ProductRepository {
   }
 }
 
-
-
-
-const getLikedUser = async (id: string, userId: string | undefined): Promise<{ id: string; }[] | null> => {
+const getLikedUser = async (id: string, userId: string) => {
   const product = await prisma.product.findUnique({
     where: { id },
     select: {
@@ -123,20 +130,6 @@ const getLikedUser = async (id: string, userId: string | undefined): Promise<{ i
   })
   return product ? product.likedUser : null
 }
-
-const likeProduct = async (id: string, userId: string | undefined): Promise<void> => {
-  await prisma.product.update({
-    where: { id },
-    data: { likedUser: { connect: { id: userId } } }
-  });
-}
-
-const unlikeProduct = async (id: string, userId: string | undefined): Promise<void> => {
-  await prisma.product.update({
-    where: { id },
-    data: { likedUser: { disconnect: { id: userId } } }
-  });
-};
 
 const productRepository = new ProductRepository();
 export default productRepository;

@@ -9,9 +9,10 @@ import {
   CreateCommentInput,
 } from "../types/comment";
 import appError from "../utils/appError";
+import notificationService from "./notificationServices";
 
 class CommentService {
-  public async getCommentList(params: GetCommentListParams, type: 'product' | 'article'): Promise<DisplayCommentList> {
+  public async getCommentList(params: GetCommentListParams, type: 'product' | 'article') {
     const take = params.limit || 5;
     const orderBy: Prisma.ProductOrderByWithRelationInput = params.order === 'recent' ? { createdAt: 'desc' } : { createdAt: 'asc' };
     const query: GetCommentListQuery = {
@@ -46,7 +47,7 @@ class CommentService {
     return displayCommentList;
   }
 
-  public async createProductComment(input: CreateCommentInput, userId: string): Promise<DisplayCreateComment> {
+  public async createProductComment(input: CreateCommentInput, userId: string) {
     const comment = await commentRepository.saveComment(input, userId, 'product');
     const displayComment = {
       id: comment.id,
@@ -57,18 +58,26 @@ class CommentService {
     return displayComment;
   }
 
-  public async createArticleComment(input: CreateCommentInput, userId: string): Promise<DisplayCreateComment> {
-    const comment = await commentRepository.saveComment(input, userId, 'article');
+  public async createArticleComment(input: CreateCommentInput, userId: string) {
+    const comment = await commentRepository.saveComment(input, userId, 'article') as unknown as { id: string, content: string, createdAt: Date, userId: string, article: { userId: string } };
+    const targetId = comment.article.userId;
+    const commentNotification = {
+      relatedId: comment.id,
+      userId: targetId
+    };
+    await notificationService.createArticleCommentNotification(commentNotification);
+
     const displayComment = {
       id: comment.id,
       content: comment.content,
       createdAt: comment.createdAt,
       userId: comment.userId,
     };
+
     return displayComment;
   }
 
-  public async patchProductComment(id: string, userId: string, input: Partial<CreateCommentInput>): Promise<DisplayCreateComment> {
+  public async patchProductComment(id: string, userId: string, input: Partial<CreateCommentInput>) {
     const updatedComment = await commentRepository.updateComment(id, userId, input, 'product');
     const displayComment = {
       id: updatedComment.id,

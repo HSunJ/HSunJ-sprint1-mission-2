@@ -12,7 +12,7 @@ class CommentRepository {
       await prisma.articleComment.findMany(query);
   }
 
-  public async saveComment(input: CreateCommentInput, userId: string, type: 'product' | 'article'): Promise<DisplayCreateComment> {
+  public async saveComment(input: CreateCommentInput, userId: string, type: 'product' | 'article') {
     const createdComment = type === 'product' ?
       await prisma.productComment.create({
         data: {
@@ -46,12 +46,13 @@ class CommentRepository {
           content: true,
           createdAt: true,
           userId: true,
+          article: { select: { userId: true } }
         },
       });
     return createdComment;
   };
 
-  public async updateComment(id: string, userId: string, input: Partial<CreateCommentInput>, type: 'product' | 'article'): Promise<DisplayCreateComment> {
+  public async updateComment(id: string, userId: string, input: Partial<CreateCommentInput>, type: 'product' | 'article') {
     const updatedComment = type === 'product' ?
       await prisma.productComment.update({
         where: { id, userId },
@@ -76,7 +77,7 @@ class CommentRepository {
     return updatedComment;
   };
 
-  public async deleteById(id: string, userId: string, type: 'product' | 'article'): Promise<DisplayCreateComment> {
+  public async deleteById(id: string, userId: string, type: 'product' | 'article') {
     const deletedComment = type === 'product' ?
       await prisma.productComment.delete({ where: { id, userId } }) :
       await prisma.articleComment.delete({ where: { id, userId } });
@@ -84,7 +85,7 @@ class CommentRepository {
   }
 };
 
-async function deleteById(id: string, userId: string, type: 'product' | 'article'): Promise<DisplayCreateComment> {
+async function deleteById(id: string, userId: string, type: 'product' | 'article') {
   const deletedComment = type === 'product' ?
     await prisma.productComment.delete({ where: { id, userId } }) :
     await prisma.articleComment.delete({ where: { id, userId } });
