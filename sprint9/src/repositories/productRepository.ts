@@ -1,6 +1,6 @@
 import prisma from "../config/prisma";
 import { Prisma } from "@prisma/client";
-
+import appError from "../utils/appError";
 import { GetProductListParams, ProductListItem, ProductDetail, ProductCreateInput, DisplayCreateProduct } from "../types/product.d";
 
 class ProductRepository {
@@ -43,12 +43,19 @@ class ProductRepository {
         select: { id: true }
       } : false,
     }
-    return await (tx || prisma).product.findUniqueOrThrow({
-      select: select || defaultSelect,
-      where: {
-        id,
-      },
-    });
+    try {
+      return await (tx || prisma).product.findUniqueOrThrow({
+        select: select || defaultSelect,
+        where: {
+          id,
+        },
+      });
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+        throw new appError.NotFoundError("상품이 존재하지 않습니다");
+      }
+    }
+    
   }
 
   public async getLiked(userId: string, id: string) {
