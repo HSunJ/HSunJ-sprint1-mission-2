@@ -39,11 +39,18 @@ class AuthorizationError extends AppError {
   }
 }
 
+class InternalServerError extends AppError {
+  constructor(message: string = "Internal Server Error") {
+    super(message, 500);
+  }
+}
+
 export default {
   AppError,
   NotFoundError,
   BadRequestError,
   UnauthorizedError,
   ConflictError,
-  AuthorizationError
+  AuthorizationError,
+  InternalServerError
 };
