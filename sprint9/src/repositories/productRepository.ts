@@ -51,11 +51,10 @@ class ProductRepository {
         },
       });
     } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+      if (error.code === 'P2025') {
         throw new appError.NotFoundError("상품이 존재하지 않습니다");
       }
     }
-    
   }
 
   public async getLiked(userId: string, id: string) {

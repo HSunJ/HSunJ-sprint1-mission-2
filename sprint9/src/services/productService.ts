@@ -57,14 +57,14 @@ class ProductService {
   }
 
   public async patchProduct(userId: string, id: string, input: Partial<ProductCreateInput>) {
-    await prisma.$transaction(async (tx) => {
+    return await prisma.$transaction(async (tx) => {
       const oldProduct = await productRepository.getById(userId, id, tx, { price: true }) as unknown as { price: number };
       const product = await productRepository.patchProduct(id, userId, input, tx);
       if (!product) {
         throw new appError.NotFoundError("상품이 존재하지 않습니다");
       }
 
-      if (oldProduct.price !== product.price) {
+      if (oldProduct.price !== product.price && product.likedUser.length > 0) {
         // 가격이 변경된 경우에 대한 처리
         const likedUsers = product.likedUser.map(user => user.id);
         const productData = {
@@ -73,9 +73,11 @@ class ProductService {
           oldprice: oldProduct.price,
           newprice: product.price,
           likedUsers
-        }
-        const notifications = notificationService.createPriceChangeNotifications(productData);
+        };
+
+        const notifications = await notificationService.createPriceChangeNotifications(productData);
       }
+
       const isLiked = product.likedUser.filter(user => user.id === userId)
       const displayProduct = {
         id: product.id,
