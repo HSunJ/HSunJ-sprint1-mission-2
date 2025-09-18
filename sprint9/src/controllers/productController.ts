@@ -9,7 +9,6 @@ import appError from '../utils/appError';
 export const getProductList: RequestHandler = async (req, res) => {
   const { offset = 0, limit = 10, order = "recent", keyword = "" } = req.query;
   const userId = req.user?.userId;
-  if (!userId) throw new appError.UnauthorizedError("로그인이 필요합니다");
 
   const products = await productService.getProductList(userId, {
     keyword: keyword as string,
@@ -24,7 +23,6 @@ export const getProductList: RequestHandler = async (req, res) => {
 export const getProduct: RequestHandler = async (req, res) => {
   const { id } = req.params;
   const userId = req.user?.userId;
-  if (!userId) throw new appError.UnauthorizedError("로그인이 필요합니다");
 
   const product = await productService.getProduct(userId, id);
 
