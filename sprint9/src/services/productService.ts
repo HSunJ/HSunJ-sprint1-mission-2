@@ -1,12 +1,7 @@
 import prisma from "../config/prisma";
 import productRepository from "../repositories/productRepository";
 import {
-  ProductListItem,
   GetProductListParams,
-  DisplayProductListItem,
-  ProductDetail,
-  DisplayProductDetail,
-  DisplayCreateProduct,
   ProductCreateInput
 } from "../types/product";
 import appError from "../utils/appError";
@@ -58,11 +53,9 @@ class ProductService {
 
   public async patchProduct(userId: string, id: string, input: Partial<ProductCreateInput>) {
     return await prisma.$transaction(async (tx) => {
-      const oldProduct = await productRepository.getById(userId, id, tx, { price: true }) as unknown as { price: number };
+      const oldProduct = await productRepository.getById(userId, id, tx, { price: true, userId: true })
+      if (oldProduct.userId !== userId) throw new appError.AuthorizationError("권한이 없습니다");
       const product = await productRepository.patchProduct(id, userId, input, tx);
-      if (!product) {
-        throw new appError.NotFoundError("상품이 존재하지 않습니다");
-      }
 
       if (oldProduct.price !== product.price && product.likedUser.length > 0) {
         // 가격이 변경된 경우에 대한 처리
@@ -97,10 +90,7 @@ class ProductService {
   }
 
   public async isLiked(userId: string, id: string) {
-    const product = await productRepository.getById(userId, id);
-    if (!product) {
-      throw new appError.NotFoundError("게시글이 존재하지 않습니다");
-    }
+    const product = await productRepository.getById(userId, id, null, { likedUser: true });
     return product.likedUser ? product.likedUser.length > 0 : false;
   }
 

@@ -1,7 +1,6 @@
-import { User } from '@prisma/client';
 import prisma from '../config/prisma';
 
-async function findById(id: string) {
+async function findById(id) {
   return prisma.user.findUnique({
     where: {
       id,
@@ -9,7 +8,7 @@ async function findById(id: string) {
   });
 }
 
-async function findByEmail(email: string) {
+async function findByEmail(email) {
   return await prisma.user.findUnique({
     where: {
       email,
@@ -17,7 +16,7 @@ async function findByEmail(email: string) {
   });
 }
 
-async function save(userData: User) {
+async function save(userData) {
   return prisma.user.create({
     data: {
       ...userData
@@ -25,7 +24,7 @@ async function save(userData: User) {
   });
 }
 
-async function update(id: string, data: Partial<User>) {
+async function update(id, data) {
   return prisma.user.update({
     where: {
       id,
@@ -42,7 +41,7 @@ async function update(id: string, data: Partial<User>) {
 //   });
 // }
 
-async function getProductById(id: string) {
+async function getProductById(id) {
   return await prisma.user.findUnique({
     where: { id },
     select: {
@@ -62,7 +61,7 @@ async function getProductById(id: string) {
   })
 }
 
-async function getLikedProductList(id: string) {
+async function getLikedProductList(id) {
   return await prisma.user.findUnique({
     where: { id },
     select: {
@@ -78,7 +77,7 @@ async function getLikedProductList(id: string) {
   });
 }
 
-async function getArticleById(id: string) {
+async function getArticleById(id) {
   return await prisma.user.findUnique({
     where: { id },
     select: {
@@ -98,7 +97,7 @@ async function getArticleById(id: string) {
   })
 }
 
-async function getLikedArticleList(id: string) {
+async function getLikedArticleList(id) {
   return await prisma.user.findUnique({
     where: { id },
     select: {

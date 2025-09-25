@@ -1,8 +1,6 @@
 import { User } from "@prisma/client";
-
 import { hashPassword, checkPassword } from "../utils/hash";
 import { RequestHandler } from "express";
-
 import userService from "../services/userService";
 import userRepository from "../repositories/userRepository";
 import appError from "../utils/appError";
@@ -16,11 +14,7 @@ export const createUser: RequestHandler = async (req, res, next) => {
       salt,
     }
 
-    if (await userService.checkExistingUser(userData.email)) {
-      throw new appError.ConflictError("이미 존재하는 유저입니다.");
-    }
-
-    const newUser = await userRepository.save(userData);
+    const newUser = await userService.signUp(userData);
     return res.status(201).json(userService.filterSensitiveUserData(newUser));
   } catch (error) {
     next(error)
@@ -31,20 +25,7 @@ export const login: RequestHandler = async (req, res, next) => {
   try {
     const email: string = req.body.email;
     const password: string = req.body.password;
-    const sensitiveUser = await userRepository.findByEmail(email);
-    if (!sensitiveUser) {
-      throw new appError.NotFoundError("존재하지 않는 유저입니다");
-    }
-    if (!await checkPassword(password, sensitiveUser.password)) {
-      throw new appError.UnauthorizedError("비밀번호가 틀렸습니다");
-    }
-
-    const user = userService.filterSensitiveUserData(sensitiveUser);
-    // 로그인할때 액세스토큰과 리프래시토큰 발급
-    const accessToken = await userService.createToken(user, 'access');
-    const refreshToken = await userService.createToken(user, 'refresh');
-    // 리프래시토큰 db에 저장
-    await userRepository.update(user.id, { refreshToken });
+    const { refreshToken, ...user} = await userService.logIn(email, password);
 
     // 리프레시 토큰을 쿠키에 담아 전달
     res.cookie('refreshToken', refreshToken, {
@@ -54,7 +35,6 @@ export const login: RequestHandler = async (req, res, next) => {
     });
     const response = {
       ...user,
-      accessToken,
       message: "로그인에 성공했습니다"
     };
     return res.status(201).json(response);

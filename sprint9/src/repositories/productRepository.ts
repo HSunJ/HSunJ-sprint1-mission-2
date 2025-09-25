@@ -30,7 +30,7 @@ class ProductRepository {
     });
   }
 
-  public async getById(userId: string, id: string, tx?: Prisma.TransactionClient, select?: any) {
+  public async getById(userId: string, id: string, tx?: Prisma.TransactionClient, select?: any): Promise<any> {
     const defaultSelect = {
       id: true,
       name: true,
@@ -101,26 +101,43 @@ class ProductRepository {
   }
 
   public async deleteProduct(id: string, userId: string) {
-    await prisma.product.delete({
-      where: {
-        id,
-        userId
-      }
-    });
+    await prisma.$transaction(async (tx) => {
+      const product = await tx.product.findUnique({
+        where: { id },
+        select: { userId: true }
+      })
+      if (!product) throw new appError.NotFoundError("상품이 존재하지 않습니다");
+      if (product.userId !== userId) throw new appError.AuthorizationError("권한이 없습니다");
+
+      await tx.product.delete({ where: { id } });
+    })
+
   }
 
   public async like(id: string, data: { likedUser: { connect: { id: string } } }) {
-    await prisma.product.update({
-      where: { id },
-      data
-    });
+    try {
+      await prisma.product.update({
+        where: { id },
+        data
+      });
+    } catch (error) {
+      if (error.code === 'P2025') {
+        throw new appError.NotFoundError("상품이 존재하지 않습니다");
+      }
+    }
   }
 
   public async unlike(id: string, data: { likedUser: { disconnect: { id: string } } }) {
-    await prisma.product.update({
-      where: { id },
-      data
-    });
+    try {
+      await prisma.product.update({
+        where: { id },
+        data
+      });
+    } catch (error) {
+      if (error.code === 'P2025') {
+        throw new appError.NotFoundError("상품이 존재하지 않습니다");
+      }
+    }
   }
 }
 

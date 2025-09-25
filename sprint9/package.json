@@ -7,7 +7,7 @@
     "dev": "nodemon --watch ./src --exec ts-node ./src/app.ts",
     "build": "tsc",
     "socket": "node socket.js",
-    "test": "dotenv -e .env.test -- npm run prisma:migrate && dotenv -e .env.test -- jest --coverage",
+    "test": "dotenv -e .env.test -- npm run prisma:migrate && dotenv -e .env.test -- jest --runInBand",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:seed": "tsx prisma/seed.ts"
