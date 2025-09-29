@@ -1,4 +1,5 @@
-import Express from 'express';
+import 'express';
+import { File as MulterFile } from 'multer';
 
 // req.user 객체에 대한 타입 정의
 declare global {
@@ -8,5 +9,11 @@ declare global {
         userId: string;
       };
     }
+  }
+}
+
+declare module 'multer' {
+  interface File {
+    location?: string;
   }
 }

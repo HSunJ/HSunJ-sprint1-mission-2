@@ -3,8 +3,6 @@ import express, { Request, Response, NextFunction, Errback, ErrorRequestHandler 
 import cookieParser from 'cookie-parser';
 import path from 'path';
 import cors from 'cors';
-import { Prisma } from '@prisma/client';
-
 import appError from './utils/appError';
 import productRouter from './routes/product';
 import articleRouter from './routes/article';
@@ -12,8 +10,6 @@ import uploadRouter from './routes/upload';
 import commentRouter from './routes/coments';
 import userRouter from './routes/users';
 import notificationRouter from './routes/notificationRoute';
-import { fileURLToPath } from 'url';
-import { StructError } from 'superstruct';
 
 dotenv.config();
 
