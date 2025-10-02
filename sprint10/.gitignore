@@ -4,7 +4,7 @@ node_modules
 
 /generated/prisma
 /uploads
-
+/dist
 /coverage
 /src/prisma/migrations
 
