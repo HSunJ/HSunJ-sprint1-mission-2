@@ -1,4 +1,6 @@
 import * as dotenv from 'dotenv';
+dotenv.config();
+
 import express, { Request, Response, NextFunction, Errback, ErrorRequestHandler } from 'express';
 import cookieParser from 'cookie-parser';
 import path from 'path';
@@ -10,8 +12,6 @@ import uploadRouter from './routes/upload';
 import commentRouter from './routes/coments';
 import userRouter from './routes/users';
 import notificationRouter from './routes/notificationRoute';
-
-dotenv.config();
 
 const app = express();
 
