@@ -27,10 +27,10 @@ jobs:
       postgres: # 서비스 이름
         image: postgres:15 # 사용할 Docker 이미지
         env:
-          POSTGRES_DB: pandamarket-test # 데이터베이스 이름
-          POSTGRES_USER: postgres # 사용자 이름
-          POSTGRES_PASSWORD: password123 # 비밀번호
-        port:
+          POSTGRES_DB: ${{ secrets.TEST_DB_NAME }} # 데이터베이스 이름
+          POSTGRES_USER: ${{ secrets.TEST_DB_USER }} # 사용자 이름
+          POSTGRES_PASSWORD: ${{ secrets.TEST_DB_PASSWORD }} # 비밀번호
+        ports:
           - 5432:5432 # 호스트:컨테이너 포트 매핑
         options: > # 서비스 시작 옵션
           --health-cmd pg_isready
