@@ -14,8 +14,7 @@ on:
 
 # 작업 단위: 워크플로우에서 실행할 작업 묶음
 jobs:
-  # kimcode-test라는 Job
-  kimcode-test:
+  merge-test:
     # GitHub이 제공하는 최신 Ubuntu 환경에서 실행됨
     runs-on: ubuntu-latest
 
@@ -24,6 +23,9 @@ jobs:
       # GitHub 저장소 코드를 runner VM으로 가져옴
       - name: Checkout code
         uses: actions/checkout@v5
+
+      - name: Change directory
+        run: cd sprint11
 
       # runner 환경에 Node.js 설치
       - name: Set up Node.js
