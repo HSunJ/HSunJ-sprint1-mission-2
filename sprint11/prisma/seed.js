@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
-import { PRODUCTS, ARTICLES, PRODUCTCOMENTS, ARTICLECOMENTS, USERS } from './mock.js';
-import { hashPassword } from '../src/utils/hash.js';
+import { PRODUCTS, ARTICLES, PRODUCTCOMENTS, ARTICLECOMENTS, USERS } from './mock';
+import { hashPassword } from '../src/utils/hash';
 
 const prisma = new PrismaClient();
 
