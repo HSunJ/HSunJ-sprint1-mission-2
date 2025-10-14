@@ -18,6 +18,26 @@ jobs:
     # GitHub이 제공하는 최신 Ubuntu 환경에서 실행됨
     runs-on: ubuntu-latest
 
+    # 환경 변수 설정
+    env:
+      DATABASE_URL: ${{ secrets.TEST_DB_URL }}
+
+    # PostgreSQL 서비스 설정
+    services:
+      postgres: # 서비스 이름
+        image: postgres:15 # 사용할 Docker 이미지
+        env:
+          POSTGRES_DB: pandamarket-test # 데이터베이스 이름
+          POSTGRES_USER: postgres # 사용자 이름
+          POSTGRES_PASSWORD: password123 # 비밀번호
+        port:
+          - 5432:5432 # 호스트:컨테이너 포트 매핑
+        options: > # 서비스 시작 옵션
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     # 실행 단계
     steps:
       # GitHub 저장소 코드를 runner VM으로 가져옴
