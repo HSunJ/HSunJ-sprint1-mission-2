@@ -1,0 +1,44 @@
+# 워크플로우 이름: GitHub Actions 탭에 표시됨
+name: Test
+
+# 트리거: 언제 이 워크플로우가 실행될지 정의
+on:
+  # main 브랜치에 코드가 푸시될 때 실행
+  push:
+    branches:
+      - main
+  # main 브랜치로 향하는 PR이 생성/수정될 때 실행
+  pull_request:
+    branches:
+      - main
+
+# 작업 단위: 워크플로우에서 실행할 작업 묶음
+jobs:
+  # kimcode-test라는 Job
+  kimcode-test:
+    # GitHub이 제공하는 최신 Ubuntu 환경에서 실행됨
+    runs-on: ubuntu-latest
+
+    # 실행 단계
+    steps:
+      # GitHub 저장소 코드를 runner VM으로 가져옴
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      # runner 환경에 Node.js 설치
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 'lts/*' # 또는 프로젝트에 필요한 Node.js 버전
+
+      # package.json 기반으로 필요한 패키지를 설치
+      - name: Install dependencies
+        run: npm install
+      
+      # 타입 오류 검사
+      - name: Type Check
+        run: npm run typecheck
+      
+      # 유닛 테스트/통합 테스트 실행 및 검증
+      - name: Run Tests
+        run: npm run test
