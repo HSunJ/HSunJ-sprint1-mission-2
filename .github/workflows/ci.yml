@@ -32,7 +32,7 @@ jobs:
           POSTGRES_PASSWORD: ${{ secrets.TEST_DB_PASSWORD }} # 비밀번호
         ports:
           - 5432:5432 # 호스트:컨테이너 포트 매핑
-        options: > # 서비스 시작 옵션
+        options: >-
           --health-cmd pg_isready
           --health-interval 10s
           --health-timeout 5s
