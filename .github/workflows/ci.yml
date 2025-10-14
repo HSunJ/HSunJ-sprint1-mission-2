@@ -24,9 +24,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v5
 
-      - name: Change directory
-        run: cd sprint11
-
       # runner 환경에 Node.js 설치
       - name: Set up Node.js
         uses: actions/setup-node@v5
@@ -35,12 +32,15 @@ jobs:
 
       # package.json 기반으로 필요한 패키지를 설치
       - name: Install dependencies
+        working-directory: sprint11
         run: npm install
       
       # 타입 오류 검사
       - name: Type Check
+        working-directory: sprint11
         run: npm run typecheck
       
       # 유닛 테스트/통합 테스트 실행 및 검증
       - name: Run Tests
+        working-directory: sprint11
         run: npm run test
