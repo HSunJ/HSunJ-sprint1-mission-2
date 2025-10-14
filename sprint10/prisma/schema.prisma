@@ -1,0 +1,100 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String           @id @default(uuid())
+  email           String           @unique
+  name            String
+  nickname        String?
+  image           String?
+  password        String
+  salt            String?
+  refreshToken    String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  productComments ProductComment[]
+  createdProducts Product[]
+  likedProducts   Product[]        @relation("ProductLikes")
+  articleComments ArticleComment[]
+  createdArticles Article[]
+  likedArticles   Article[]        @relation("ArticleLikes")
+  notifications   Notification[]
+}
+
+model Product {
+  id          String           @id @default(uuid())
+  name        String
+  description String?
+  price       Float
+  tag         Tags?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  coments     ProductComment[]
+  author      User             @relation(fields: [userId], references: [id])
+  userId      String
+  likedUser   User[]           @relation("ProductLikes")
+}
+
+model Article {
+  id        String           @id @default(uuid())
+  title     String
+  content   String
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  comments  ArticleComment[]
+  author    User             @relation(fields: [userId], references: [id])
+  userId    String
+  likedUser User[]           @relation("ArticleLikes")
+}
+
+model ProductComment {
+  id        String   @id @default(uuid())
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  product   Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String?
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+}
+
+model ArticleComment {
+  id        String   @id @default(uuid())
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  article   Article? @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  articleId String?
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  type      String
+  content   String
+  isRead    Boolean  @default(false)
+  relatedId String?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+}
+
+enum Tags {
+  FASHION
+  BEAUTY
+  SPORTS
+  ELECTRONICS
+  HOME_INTERIOR
+  HOUSEHOLD_SUPPLIES
+  KITCHENWARE
+}

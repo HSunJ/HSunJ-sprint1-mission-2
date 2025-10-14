@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Socket.IO 테스트</title>
+  <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
+  <style>
+    #notifications {
+      list-style: none;
+      padding: 0;
+      margin-top: 20px;
+    }
+
+    .notification-item {
+      background-color: white;
+      border-left: 4px solid #ccc;
+      /* 읽음 상태 */
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 4px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      /* 부드러운 전환 효과 */
+    }
+
+    .notification-item.unread {
+        background-color: #e6f7ff; /* 배경색 변경 */
+        border-left: 4px solid #007bff; /* 파란색 좌측 바 */
+        font-weight: bold; /* 폰트 굵게 */
+      }
+  </style>
+</head>
+
+<body>
+  <h1>Socket.IO 연결 테스트</h1>
+  <div>상태: <span id="status">연결 중...</span></div>
+  <h2>알림:</h2>
+  <ul id="notifications"></ul>
+  <script>
+    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1OWRmMzQ5OC1iNDhjLTQ5M2MtODBhZS1iNWUzMDIwZTcwN2YiLCJpYXQiOjE3NTc4NDcwMzAsImV4cCI6MTc1Nzg5MDIzMH0.YtJEfYqfE_6k5YDBBwNoc-K-iQP56mj_2HCFUJedszI';
+    const socket = io('http://localhost:3000', {
+      auth: {
+        token: token
+      }
+    });
+
+    socket.on('connect', () => {
+      console.log('서버에 연결됐어요!', socket.id);
+      document.getElementById('status').textContent = '연결됨: ' + socket.id;
+
+      socket.on('get-notifications', (data) => {
+        console.log('알림 수신:', data);
+        const notificationsList = document.getElementById('notifications');
+        if (Array.isArray(data.notifications)) {
+          data.notifications.forEach(notification => {
+            const item = document.createElement('li');
+            item.className = 'notification-item';
+            if (!notification.isRead) item.classList.add('unread');
+
+            item.innerHTML = `
+              <div class="notification-content">${notification.content}</div>
+              <div class="notification-date">${notification.createdAt}</div>
+            `;
+
+            // 클릭 시 읽음 처리
+            item.addEventListener('click', async () => {
+              if (notification.isRead) return; // 이미 읽은 알림이면 무시
+              const response = await fetch(`http://localhost:3000/notifications/${notification.id}/read`, {
+                method: 'PATCH',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`
+                }
+              });
+              const result = await response.json();
+              if (result.success) {
+                item.classList.remove('unread');
+                const unreadBadge = document.querySelector('.unread-badge');
+                unreadBadge.textContent = `읽지 않은 알림: ${result.unreadCount}개`;
+              }
+            });
+            notificationsList.appendChild(item);
+          });
+        }
+
+        const unreadBadge = document.createElement('div');
+        unreadBadge.className = 'unread-badge';
+        unreadBadge.textContent = `읽지 않은 알림: ${data.unreadCount}개`;
+        document.body.appendChild(unreadBadge);
+      });
+
+      socket.on('price-change-notification', (data) => {
+        console.log('가격 변경 알림 수신:', data);
+        const notificationsList = document.getElementById('notifications');
+        const item = document.createElement('li');
+        item.className = 'notification-item';
+        if (!notification.isRead) item.classList.add('unread');
+        
+        item.innerHTML = `
+          <div class="notification-content">${data.message}</div>
+        `;
+        notificationsList.prepend(item);
+
+        if (data.unreadCount !== undefined) {
+          const unreadBadge = document.querySelector('.unread-badge');
+          unreadBadge.textContent = `읽지 않은 알림: ${data.unreadCount}개`;
+        }
+      });
+
+      socket.on('article-comment-notification', (data) => {
+        console.log('댓글 알림 수신:', data);
+        const notificationsList = document.getElementById('notifications');
+        const item = document.createElement('li');
+        item.className = 'notification-item unread';
+        item.innerHTML = `
+          <div class="notification-content">${data.message}</div>
+        `;
+        notificationsList.prepend(item);
+
+        if (data.unreadCount !== undefined) {
+          const unreadBadge = document.querySelector('.unread-badge');
+          unreadBadge.textContent = `읽지 않은 알림: ${data.unreadCount}개`;
+        }
+      });
+    });
+
+    socket.on('connect_error', (err) => {
+      console.error('연결 에러:', err.message);
+      document.getElementById('status').textContent = '연결 실패: ' + err.message;
+    });
+  </script>
+</body>
+
+</html>
