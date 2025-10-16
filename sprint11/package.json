@@ -7,7 +7,7 @@
     "dev": "nodemon --watch ./src --exec ts-node ./src/main.ts",
     "build": "tsc",
     "socket": "node socket.js",
-    "test": "dotenv -e .env.test -- npm run prisma:migrate && dotenv -e .env.test -- jest --runInBand --coverage",
+    "test": "npm run prisma:migrate && jest --runInBand --coverage",
     "typecheck": "tsc --noEmit",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
@@ -48,7 +48,7 @@
     "jest": "^30.1.3",
     "nodemon": "^3.1.0",
     "prisma": "^6.10.1",
-    "ts-jest": "^29.4.2",
+    "ts-jest": "^29.4.5",
     "ts-node": "^10.9.2",
     "tsx": "^4.20.5",
     "typescript": "^5.8.3"
