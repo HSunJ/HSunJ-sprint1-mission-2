@@ -25,6 +25,7 @@ jobs:
       
       # npm 세팅
       - name: Install dependencies
+        working-directory: sprint11
         run: npm install
         
       # EC2 배포
