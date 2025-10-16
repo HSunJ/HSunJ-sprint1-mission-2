@@ -1,0 +1,47 @@
+name: pandamarket-app
+services:
+  app:
+    image: codeit/pandamarket-app-image:1.0.0
+    build:
+      tags:
+        - codeit/pandamarket-app-image:1.0.0
+        - codeit/pandamarket-app-image:latest
+      args:
+        - NODE_VERSION=22.16.0
+      dockerfile: ./dockerfile
+      pull: true
+      context: .
+    container_name: pandamarket-app-container
+    environment:
+      - PORT=3000
+      - ENVIRONMENT=DEVELOPMENT
+      - DATABASE_URL=${DATABASE_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_REGION=${AWS_REGION}
+    networks:
+      - pandamarket-app-network
+    ports:
+      - 3000:3000
+    volumes:
+      - pandamarket-app-upload-volume:/docker-compose-app/uploads
+  db:
+    image: postgres:15
+    container_name: pandamarket-db-container
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    networks:
+      - pandamarket-app-network
+    volumes:
+      - pandamarket-app-volume:/var/lib/postgresql/data
+networks:
+  pandamarket-app-network:
+    name: pandamarket-app-network
+volumes:
+  pandamarket-app-volume:
+    name: pandamarket-app-volume
+  pandamarket-app-upload-volume:
+    name: pandamarket-app-upload-volume

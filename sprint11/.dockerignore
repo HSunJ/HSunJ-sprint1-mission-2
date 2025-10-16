@@ -1,0 +1,12 @@
+node_modules
+
+dist
+http
+infra
+coverage
+aws
+
+.env
+.env.test
+.gitignore
+README.md
