@@ -1,8 +1,6 @@
 import express from "express";
 import multer from "multer";
-import path from "path";
 import fs from 'fs';
-import { fileURLToPath } from "url";
 import uploadS3 from "../middlewares/multerS3";
 
 const uploadRouter = express.Router();
@@ -10,12 +8,9 @@ const ENV = process.env.ENVIRONMENT;
 
 let upload
 if (ENV === 'DEVELOPMENT') {
-  const filename = __filename;
-  const dirname = path.dirname(filename);
-
   const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-      const uploadDir = path.join(dirname, '../uploads');
+      const uploadDir = '/docker-compose-app/uploads';
       if (!fs.existsSync(uploadDir)) {
         fs.mkdirSync(uploadDir, { recursive: true });
       }
