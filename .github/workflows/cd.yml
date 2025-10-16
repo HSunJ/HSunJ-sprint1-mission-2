@@ -1,0 +1,45 @@
+# 본 Github Actions 이름은 "Deploy to EC2"
+name: Deploy to EC2
+
+# 트리거
+on:
+  push:
+    branches:
+      - main
+
+# 작업
+jobs:
+  deploy:                   # job 커스텀 이름
+    runs-on: ubuntu-latest  # 실행 환경
+    
+    steps:                  # 세부 단계
+      # 코드 Checkout
+      - name: Checkout code
+        uses: actions/checkout@v5
+        
+      # Node.js 세팅
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 'lts/*'
+      
+      # npm 세팅
+      - name: Install dependencies
+        run: npm install
+        
+      # EC2 배포
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          port: 22
+          script: |
+            cd ~/HSunJ-sprint1-mission-2/sprint11 # EC2 인스턴스 내 프로젝트 경로로 진입
+            git pull origin main # 코드 최신화
+            npm install
+            npm run build
+            # npm run prisma:migrate # 예: prisma migrate deploy로 마이그레이션 적용하기
+            npm run start:prod
+            echo "✅ Deployment successful!"
